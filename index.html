@@ -8,12 +8,18 @@
 </head>
 <body>
   <div class="chat-container">
-    <div class="name-input">
+    <div class="sign-in-container">
+      <input type="email" placeholder="Email" id="email-input">
+      <input type="password" placeholder="Password" id="password-input">
+      <button id="sign-in-button">Sign In</button>
+      <button id="sign-up-button">Sign Up</button>
+    </div>
+    <div class="name-input" style="display: none;">
       <input type="text" placeholder="Enter your name..." id="name-input">
       <button id="join-button">Join</button>
     </div>
     <div class="chat-messages"></div>
-    <div class="chat-input">
+    <div class="chat-input" style="display: none;">
       <input type="text" placeholder="Type your message..." id="message-input" disabled>
       <button id="send-button" disabled>Send</button>
     </div>
@@ -22,6 +28,74 @@
       <button id="save-name-button">Save</button>
     </div>
   </div>
+
+  <script type="module">
+    // Import the functions you need from the SDKs you need
+    import { initializeApp } from "firebase/app";
+    import { getAnalytics } from "firebase/analytics";
+    import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
+    import { getDatabase, ref, set, get, child, update, remove } from "firebase/database";
+
+    // Your web app's Firebase configuration
+    // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+    const firebaseConfig = {
+      apiKey: "AIzaSyDisnhcjYmvZc2y9-toeWWKHq9nHYb8Fn4",
+      authDomain: "chatroom-50dfb.firebaseapp.com",
+      projectId: "chatroom-50dfb",
+      storageBucket: "chatroom-50dfb.appspot.com",
+      messagingSenderId: "533310796123",
+      appId: "1:533310796123:web:1f9cb3326563d3dee72a7e",
+      measurementId: "G-GTXX84ZBPD"
+    };
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const analytics = getAnalytics(app);
+    const auth = getAuth();
+    const database = getDatabase();
+
+    // Sign-in function
+    async function signInWithEmail(email, password) {
+      try {
+        const userCredential = await signInWithEmailAndPassword(auth, email, password);
+        const user = userCredential.user;
+        console.log("User signed in:", user);
+        // Display success message or redirect to chat page
+      } catch (error) {
+        console.error("Error signing in:", error);
+        // Handle sign-in error
+      }
+    }
+
+    // Sign-up function
+    async function signUpWithEmail(email, password) {
+      try {
+        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+        const user = userCredential.user;
+        console.log("User signed up:", user);
+        // Display success message or redirect to chat page
+      } catch (error) {
+        console.error("Error signing up:", error);
+        // Handle sign-up error
+      }
+    }
+
+    // Event listener for sign-in button
+    const signInButton = document.getElementById('sign-in-button');
+    signInButton.addEventListener('click', () => {
+      const emailInput = document.getElementById('email-input');
+      const passwordInput = document.getElementById('password-input');
+      signInWithEmail(emailInput.value, passwordInput.value);
+    });
+
+    // Event listener for sign-up button
+    const signUpButton = document.getElementById('sign-up-button');
+    signUpButton.addEventListener('click', () => {
+      const emailInput = document.getElementById('email-input');
+      const passwordInput = document.getElementById('password-input');
+      signUpWithEmail(emailInput.value, passwordInput.value);
+    });
+  </script>
 
   <script src="script.js"></script>
 </body>

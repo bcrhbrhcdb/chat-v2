@@ -6,6 +6,9 @@ const chatMessages = document.querySelector('.chat-messages');
 const profileMenu = document.querySelector('.profile-menu');
 const newNameInput = document.getElementById('new-name-input');
 const saveNameButton = document.getElementById('save-name-button');
+const signInContainer = document.querySelector('.sign-in-container');
+const nameInputContainer = document.querySelector('.name-input');
+const chatInputContainer = document.querySelector('.chat-input');
 
 let name = '';
 
@@ -23,6 +26,12 @@ function sendMessage() {
   if (message !== '') {
     addMessage(`${name}: ${message}`);
     messageInput.value = '';
+
+    // Save message to Firebase
+    database.ref('messages').push({
+      name,
+      message
+    });
   }
 }
 
@@ -35,6 +44,14 @@ function joinChat() {
     joinButton.disabled = true;
     messageInput.disabled = false;
     sendButton.disabled = false;
+    nameInputContainer.style.display = 'none';
+    chatInputContainer.style.display = 'flex';
+
+    // Fetch and display existing messages
+    database.ref('messages').on('child_added', (snapshot) => {
+      const { name, message } = snapshot.val();
+      addMessage(`${name}: ${message}`);
+    });
   }
 }
 
@@ -50,6 +67,11 @@ function saveName() {
     addMessage(`${name} changed their name to ${newName}.`);
     name = newName;
     profileMenu.style.display = 'none';
+
+    // Update name in Firebase
+    database.ref('users/' + name).set({
+      name: newName
+    });
   }
 }
 
