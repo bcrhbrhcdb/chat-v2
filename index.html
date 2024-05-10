@@ -22,6 +22,8 @@
     <div class="chat-input" style="display: none;">
       <input type="text" placeholder="Type your message..." id="message-input" disabled>
       <button id="send-button" disabled>Send</button>
+      <button id="change-name-button">Change Name</button>
+      <button id="sign-out-button">Sign Out</button>
     </div>
     <div class="profile-menu" style="display: none;">
       <input type="text" placeholder="Enter new name..." id="new-name-input">
@@ -32,8 +34,9 @@
   <script type="module">
     // Import the functions you need from the SDKs you need
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.19.1/firebase-app.js";
-    import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.19.1/firebase-auth.js";
-    import { getDatabase, ref, set, push, onValue } from "https://www.gstatic.com/firebasejs/9.19.1/firebase-database.js";
+    import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.19.1/firebase-analytics.js";
+    import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/9.19.1/firebase-auth.js";
+    import { getDatabase, ref, set, get, child, update, remove, onValue, push } from "https://www.gstatic.com/firebasejs/9.19.1/firebase-database.js";
 
     // Your web app's Firebase configuration
     const firebaseConfig = {
@@ -48,6 +51,7 @@
 
     // Initialize Firebase
     const app = initializeApp(firebaseConfig);
+    const analytics = getAnalytics(app);
     const auth = getAuth(app);
     const database = getDatabase(app);
 
@@ -78,10 +82,31 @@
       }
     }
 
+    // Sign-out function
+    async function signOutUser() {
+      try {
+        await signOut(auth);
+        console.log("User signed out");
+        // Display success message or redirect to sign-in page
+        showSignInInterface();
+      } catch (error) {
+        console.error("Error signing out:", error);
+        // Handle sign-out error
+      }
+    }
+
+    // Function to show the sign-in interface
+    function showSignInInterface() {
+      signInContainer.style.display = 'flex';
+      nameInputContainer.style.display = 'none';
+      chatInputContainer.style.display = 'none';
+    }
+
     // Function to show the chat interface
     function showChatInterface() {
       signInContainer.style.display = 'none';
-      nameInputContainer.style.display = 'flex';
+      nameInputContainer.style.display = 'none';
+      chatInputContainer.style.display = 'flex';
     }
 
     // Event listener for sign-in button
@@ -100,136 +125,138 @@
       signUpWithEmail(emailInput.value, passwordInput.value);
     });
 
+    // Event listener for sign-out button
+    const signOutButton = document.getElementById('sign-out-button');
+    signOutButton.addEventListener('click', signOutUser);
+
     const nameInput = document.getElementById('name-input');
     const joinButton = document.getElementById('join-button');
     const messageInput = document.getElementById('message-input');
     const sendButton = document.getElementById('send-button');
-    const chatMessages = document.querySelector('.chat-messages');
-    const profileMenu = document.querySelector('.profile-menu');
-    const newNameInput = document.getElementById('new-name-input');
-    const saveNameButton = document.getElementById('save-name-button');
-    const signInContainer = document.querySelector('.sign-in-container');
-    const nameInputContainer = document.querySelector('.name-input');
-    const chatInputContainer = document.querySelector('.chat-input');
+    const changeName = document.getElementById('change-name-button');
+changeName.addEventListener('click', openProfileMenu);
 
-    let currentUser = null;
+const chatMessages = document.querySelector('.chat-messages');
+const profileMenu = document.querySelector('.profile-menu');
+const newNameInput = document.getElementById('new-name-input');
+const saveNameButton = document.getElementById('save-name-button');
+const signInContainer = document.querySelector('.sign-in-container');
+const nameInputContainer = document.querySelector('.name-input');
+const chatInputContainer = document.querySelector('.chat-input');
 
-    // Function to add a message to the chat
-    function addMessage(message) {
-      const messageElement = document.createElement('div');
-      messageElement.textContent = message;
-      chatMessages.appendChild(messageElement);
-      chatMessages.scrollTop = chatMessages.scrollHeight;
-    }
+let currentUser = null;
 
-    // Function to send a message
-    function sendMessage() {
-      const message = messageInput.value.trim();
-      if (message !== '') {
-        addMessage(`${currentUser.displayName}: ${message}`);
-        messageInput.value = '';
+// Function to add a message to the chat
+function addMessage(message) {
+  const messageElement = document.createElement('div');
+  messageElement.textContent = message;
+  chatMessages.appendChild(messageElement);
+  chatMessages.scrollTop = chatMessages.scrollHeight;
+}
 
-        // Save message to Firebase
-        const messagesRef = ref(database, 'messages');
-        push(messagesRef, {
-          userId: currentUser.uid,
-          name: currentUser.displayName,
-          message
-        });
-      }
-    }
+// Function to send a message
+function sendMessage() {
+  const message = messageInput.value.trim();
+  if (message !== '') {
+    addMessage(`${currentUser.displayName}: ${message}`);
+    messageInput.value = '';
 
-    // Function to join the chat
-    function joinChat() {
-      const name = nameInput.value.trim();
-      if (name !== '') {
-        addMessage(`${currentUser.displayName} has joined the chat.`);
-        nameInput.disabled = true;
-        joinButton.disabled = true;
-        messageInput.disabled = false;
-        sendButton.disabled = false;
-        nameInputContainer.style.display = 'none';
-        chatInputContainer.style.display = 'flex';
-
-        // Fetch and display existing messages
-        const messagesRef = ref(database, 'messages');
-        onValue(messagesRef, (snapshot) => {
-          chatMessages.innerHTML = '';
-          snapshot.forEach((childSnapshot) => {
-            const { userId, name, message } = childSnapshot.val();
-            if (userId === currentUser.uid) {
-              addMessage(`You: ${message}`);
-            } else {
-              addMessage(`${name}: ${message}`);
-            }
-          });
-        });
-      }
-    }
-
-    // Function to open the profile menu
-    function openProfileMenu() {
-      profileMenu.style.display = 'block';
-    }
-
-    // Function to save the new name
-    function saveName() {
-      const newName = newNameInput.value.trim();
-      if (newName !== '') {
-        addMessage(`${currentUser.displayName} changed their name to ${newName}.`);
-        currentUser.displayName = newName;
-        profileMenu.style.display = 'none';
-
-        // Update name in Firebase
-        const userRef = ref(database, 'users/' + currentUser.uid);
-        set(userRef, {
-          name: newName
-        });
-      }
-    }
-
-    // Event listener for the join button
-    joinButton.addEventListener('click', joinChat);
-
-    // Event listener for pressing Enter key on name input
-    nameInput.addEventListener('keydown', (event) => {
-      if (event.key === 'Enter') {
-        joinChat();
-      }
+    // Save message to Firebase
+    const messagesRef = ref(database, 'messages');
+    push(messagesRef, {
+      userId: currentUser.uid,
+      name: currentUser.displayName,
+      message
     });
+  }
+}
 
-    // Event listener for the send button
-    sendButton.addEventListener('click', sendMessage);
+// Function to join the chat
+function joinChat() {
+  const name = nameInput.value.trim();
+  if (name !== '') {
+    addMessage(`${currentUser.displayName} has joined the chat.`);
+    nameInput.disabled = true;
+    joinButton.disabled = true;
+    messageInput.disabled = false;
+    sendButton.disabled = false;
+    nameInputContainer.style.display = 'none';
+    chatInputContainer.style.display = 'flex';
 
-    // Event listener for pressing Enter key on message input
-    messageInput.addEventListener('keydown', (event) => {
-      if (event.key === 'Enter') {
-        sendMessage();
-      }
+    // Fetch and display existing messages
+    const messagesRef = ref(database, 'messages');
+    onValue(messagesRef, (snapshot) => {
+      chatMessages.innerHTML = '';
+      snapshot.forEach((childSnapshot) => {
+        const { userId, name, message } = childSnapshot.val();
+        if (userId === currentUser.uid) {
+          addMessage(`You: ${message}`);
+        } else {
+          addMessage(`${name}: ${message}`);
+        }
+      });
     });
+  }
+}
 
-    // Event listener for opening the profile menu
-    nameInput.addEventListener('click', openProfileMenu);
+// Function to open the profile menu
+function openProfileMenu() {
+  profileMenu.style.display = 'block';
+}
 
-    // Event listener for saving the new name
-    saveNameButton.addEventListener('click', saveName);
+// Function to save the new name
+function saveName() {
+  const newName = newNameInput.value.trim();
+  if (newName !== '') {
+    addMessage(`${currentUser.displayName} changed their name to ${newName}.`);
+    currentUser.displayName = newName;
+    profileMenu.style.display = 'none';
 
-    // Event listener for pressing Enter key on new name input
-    newNameInput.addEventListener('keydown', (event) => {
-      if (event.key === 'Enter') {
-        saveName();
-      }
+    // Update name in Firebase
+    const userRef = ref(database, 'users/' + currentUser.uid);
+    set(userRef, {
+      name: newName
     });
+  }
+}
 
-    // Listen for authentication state changes
-    auth.onAuthStateChanged((user) => {
-      if (user) {
-        currentUser = user;
-        showChatInterface();
-      } else {
-        currentUser = null;
-      }
-    });
-  </script>
-</body>
-</html>
+// Event listener for the join button
+joinButton.addEventListener('click', joinChat);
+
+// Event listener for pressing Enter key on name input
+nameInput.addEventListener('keydown', (event) => {
+  if (event.key === 'Enter') {
+    joinChat();
+  }
+});
+
+// Event listener for the send button
+sendButton.addEventListener('click', sendMessage);
+
+// Event listener for pressing Enter key on message input
+messageInput.addEventListener('keydown', (event) => {
+  if (event.key === 'Enter') {
+    sendMessage();
+  }
+});
+
+// Event listener for saving the new name
+saveNameButton.addEventListener('click', saveName);
+
+// Event listener for pressing Enter key on new name input
+newNameInput.addEventListener('keydown', (event) => {
+  if (event.key === 'Enter') {
+    saveName();
+  }
+});
+
+// Listen for authentication state changes
+auth.onAuthStateChanged((user) => {
+  if (user) {
+    currentUser = user;
+    showChatInterface();
+  } else {
+    currentUser = null;
+    showSignInInterface();
+  }
+});
