@@ -1,3 +1,66 @@
+// Import the necessary Firebase modules
+import { initializeApp } from "firebase/app";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
+import { getDatabase, ref, set, get, child, update, remove } from "firebase/database";
+
+// Your web app's Firebase configuration
+const firebaseConfig = {
+  apiKey: "AIzaSyDisnhcjYmvZc2y9-toeWWKHq9nHYb8Fn4",
+  authDomain: "chatroom-50dfb.firebaseapp.com",
+  projectId: "chatroom-50dfb",
+  storageBucket: "chatroom-50dfb.appspot.com",
+  messagingSenderId: "533310796123",
+  appId: "1:533310796123:web:1f9cb3326563d3dee72a7e",
+  measurementId: "G-GTXX84ZBPD"
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const database = getDatabase(app);
+
+// Sign-up function
+async function signUpWithEmail(email, password) {
+  try {
+    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+    const user = userCredential.user;
+    console.log("User signed up:", user);
+    // Display success message or redirect to chat page
+  } catch (error) {
+    console.error("Error signing up:", error);
+    // Handle sign-up error
+  }
+}
+
+// Sign-in function
+async function signInWithEmail(email, password) {
+  try {
+    const userCredential = await signInWithEmailAndPassword(auth, email, password);
+    const user = userCredential.user;
+    console.log("User signed in:", user);
+    // Display success message or redirect to chat page
+  } catch (error) {
+    console.error("Error signing in:", error);
+    // Handle sign-in error
+  }
+}
+
+// Event listener for sign-in button
+const signInButton = document.getElementById('sign-in-button');
+signInButton.addEventListener('click', () => {
+  const emailInput = document.getElementById('email-input');
+  const passwordInput = document.getElementById('password-input');
+  signInWithEmail(emailInput.value, passwordInput.value);
+});
+
+// Event listener for sign-up button
+const signUpButton = document.getElementById('sign-up-button');
+signUpButton.addEventListener('click', () => {
+  const emailInput = document.getElementById('email-input');
+  const passwordInput = document.getElementById('password-input');
+  signUpWithEmail(emailInput.value, passwordInput.value);
+});
+
 const nameInput = document.getElementById('name-input');
 const joinButton = document.getElementById('join-button');
 const messageInput = document.getElementById('message-input');
@@ -44,6 +107,7 @@ function joinChat() {
     joinButton.disabled = true;
     messageInput.disabled = false;
     sendButton.disabled = false;
+    signInContainer.style.display = 'none';
     nameInputContainer.style.display = 'none';
     chatInputContainer.style.display = 'flex';
 
