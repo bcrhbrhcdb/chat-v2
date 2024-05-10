@@ -1,9 +1,13 @@
-const express = require('express');
-const app = express();
 const http = require('http');
-const server = http.createServer(app);
 const { Server } = require("socket.io");
-const io = new Server(server);
+
+const httpServer = http.createServer();
+const io = new Server(httpServer, {
+  cors: {
+    origin: "https://chat-v2-nine.vercel.app",
+    methods: ["GET", "POST"]
+  }
+});
 
 let messages = [];
 
@@ -32,6 +36,7 @@ io.on('connection', (socket) => {
   });
 });
 
-server.listen(process.env.PORT || 3000, () => {
-  console.log('listening on *:3000');
+const PORT = process.env.PORT || 3000;
+httpServer.listen(PORT, () => {
+  console.log(`Socket.IO server is running on port ${PORT}`);
 });
