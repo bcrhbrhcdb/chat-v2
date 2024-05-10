@@ -35,11 +35,17 @@
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.19.1/firebase-app.js";
     import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.19.1/firebase-analytics.js";
     import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.19.1/firebase-auth.js";
-    import { getDatabase, ref, set, get, child, update, remove } from "https://www.gstatic.com/firebasejs/9.19.1/firebase-database.js";
+    import { getDatabase, ref, set, get, child, update, remove, onValue } from "https://www.gstatic.com/firebasejs/9.19.1/firebase-database.js";
 
     // Your web app's Firebase configuration
     const firebaseConfig = {
-      // Your Firebase configuration
+      apiKey: "AIzaSyDisnhcjYmvZc2y9-toeWWKHq9nHYb8Fn4",
+      authDomain: "chatroom-50dfb.firebaseapp.com",
+      projectId: "chatroom-50dfb",
+      storageBucket: "chatroom-50dfb.appspot.com",
+      messagingSenderId: "533310796123",
+      appId: "1:533310796123:web:1f9cb3326563d3dee72a7e",
+      measurementId: "G-GTXX84ZBPD"
     };
 
     // Initialize Firebase

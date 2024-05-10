@@ -1,7 +1,7 @@
 // Import the necessary Firebase modules
 import { initializeApp } from "firebase/app";
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
-import { getDatabase, ref, set, get, child, update, remove } from "firebase/database";
+import { getDatabase, ref, set, get, child, update, remove, onValue } from "firebase/database";
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
@@ -91,7 +91,8 @@ function sendMessage() {
     messageInput.value = '';
 
     // Save message to Firebase
-    database.ref('messages').push({
+    const messagesRef = ref(database, 'messages');
+    push(messagesRef, {
       name,
       message
     });
@@ -112,9 +113,13 @@ function joinChat() {
     chatInputContainer.style.display = 'flex';
 
     // Fetch and display existing messages
-    database.ref('messages').on('child_added', (snapshot) => {
-      const { name, message } = snapshot.val();
-      addMessage(`${name}: ${message}`);
+    const messagesRef = ref(database, 'messages');
+    onValue(messagesRef, (snapshot) => {
+      chatMessages.innerHTML = '';
+      snapshot.forEach((childSnapshot) => {
+        const { name, message } = childSnapshot.val();
+        addMessage(`${name}: ${message}`);
+      });
     });
   }
 }
@@ -133,7 +138,8 @@ function saveName() {
     profileMenu.style.display = 'none';
 
     // Update name in Firebase
-    database.ref('users/' + name).set({
+    const userRef = ref(database, 'users/' + name);
+    set(userRef, {
       name: newName
     });
   }
