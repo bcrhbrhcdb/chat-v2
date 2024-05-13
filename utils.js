@@ -1,4 +1,4 @@
-import { sendEmailVerification } from "https://www.gstatic.com/firebasejs/9.0.2/firebase-auth.js";
+import { sendEmailVerification } from "firebase/auth";
 import { auth } from "./firebase.js";
 
 export const sendVerificationEmail = async (user) => {
@@ -29,4 +29,4 @@ export const sendPasswordResetEmail = async (email) => {
   } catch (error) {
     console.error('Error sending password reset email:', error);
   }
-};
+}
