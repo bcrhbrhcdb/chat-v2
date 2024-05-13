@@ -7,208 +7,50 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div class="chat-container">
-    <div class="sign-in-container">
-      <input type="email" placeholder="Email" id="email-input">
-      <input type="password" placeholder="Password" id="password-input">
+  <header>
+    <h1>Chat App</h1>
+  </header>
+  <main>
+    <section class="sign-in-container">
+      <label for="email-input">Email</label>
+      <input type="email" id="email-input" placeholder="Enter your email">
+      <label for="password-input">Password</label>
+      <input type="password" id="password-input" placeholder="Enter your password">
       <button id="sign-in-button">Sign In</button>
       <button id="sign-up-button">Sign Up</button>
       <button id="reset-password-button">Reset Password</button>
-    </div>
-    <div class="name-input" style="display: none;">
-      <input type="text" placeholder="Enter your name..." id="name-input">
+    </section>
+    <section class="name-input" style="display: none;">
+      <label for="name-input">Name</label>
+      <input type="text" id="name-input" placeholder="Enter your name...">
       <button id="join-button">Join</button>
-    </div>
-    <div class="chat-messages" id="chat-messages"></div>
-    <div class="chat-input" style="display: none;">
-      <input type="text" placeholder="Type your message..." id="message-input">
+    </section>
+    <section class="chat-messages" id="chat-messages"></section>
+    <section class="chat-input" style="display: none;">
+      <input type="text" id="message-input" placeholder="Type your message...">
       <button id="send-button">Send</button>
       <button id="change-name-button">Change Name</button>
       <button id="sign-out-button">Sign Out</button>
-    </div>
-    <div class="profile-menu" style="display: none;">
-      <input type="text" placeholder="Enter new name..." id="new-name-input">
+    </section>
+    <section class="profile-menu" style="display: none;">
+      <label for="new-name-input">New Name</label>
+      <input type="text" id="new-name-input" placeholder="Enter new name...">
       <button id="save-name-button">Save</button>
-    </div>
-  </div>
+    </section>
+  </main>
+  <footer>
+    <!-- Footer content -->
+  </footer>
 
   <!-- Firebase SDK scripts -->
   <script src="https://www.gstatic.com/firebasejs/9.0.2/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.0.2/firebase-auth.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.0.2/firebase-analytics.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.0.2/firebase-firestore.js"></script>
 
-  <!-- Import the auth object from firebase.js -->
-  <script type="module">
-    import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, sendPasswordResetEmail, updateProfile } from "https://www.gstatic.com/firebasejs/9.0.2/firebase-auth.js";
-    import { auth, db } from './firebase.js';
-    import { initializeChat } from './chat.js';
-    import { doc, setDoc, updateDoc } from "https://www.gstatic.com/firebasejs/9.0.2/firebase-firestore.js";
-    import { sendVerificationEmail } from './utils.js';
-  
-    // Get references to DOM elements
-    const emailInput = document.getElementById('email-input');
-    const passwordInput = document.getElementById('password-input');
-    const signInButton = document.getElementById('sign-in-button');
-    const signUpButton = document.getElementById('sign-up-button');
-    const resetPasswordButton = document.getElementById('reset-password-button');
-    const nameInput = document.getElementById('name-input');
-    const joinButton = document.getElementById('join-button');
-    const chatMessagesContainer = document.getElementById('chat-messages');
-    const changeNameButton = document.getElementById('change-name-button');
-    const newNameInput = document.getElementById('new-name-input');
-    const saveNameButton = document.getElementById('save-name-button');
-  
-    // Handle join button click
-    joinButton.addEventListener('click', async () => {
-      const specifiedUsername = nameInput.value.trim();
-      if (specifiedUsername) {
-        try {
-          // Sign in anonymously
-          const userCredential = await auth.signInAnonymously();
-          const user = userCredential.user;
-  
-          // Create a new user document in Firestore
-          await setDoc(doc(db, "users", user.uid), {
-            name: specifiedUsername,
-            email: user.email || null,
-          });
-  
-          // Show chat interface
-          showChatInterface();
-          // Initialize chat functionality
-          initializeChat(specifiedUsername);
-        } catch (error) {
-          console.error('Error signing in:', error);
-        }
-      } else {
-        alert('Please enter a username.');
-      }
-    });
-  
-    // Sign-in functionality
-    signInButton.addEventListener('click', () => {
-      const email = emailInput.value;
-      const password = passwordInput.value;
-      signInWithEmailAndPassword(auth, email, password)
-        .then(async (userCredential) => {
-          const user = userCredential.user;
-  
-          // Check if the user's email is verified
-          if (!user.emailVerified) {
-            await sendVerificationEmail(user); // Send email verification
-            alert('Please verify your email before continuing.');
-          } else {
-            showChatInterface();
-            initializeChat(user.displayName || 'Anonymous');
-          }
-        })
-        .catch((error) => {
-          console.error(error);
-          alert('Sign-in failed. Please check your credentials.');
-        });
-    });
-  
-    // Sign-up functionality
-    signUpButton.addEventListener('click', () => {
-      const email = emailInput.value;
-      const password = passwordInput.value;
-      createUserWithEmailAndPassword(auth, email, password)
-        .then(async (userCredential) => {
-          const user = userCredential.user;
-  
-          // Create a new user document in Firestore
-          await setDoc(doc(db, "users", user.uid), {
-            name: user.displayName || 'Anonymous',
-            email: user.email,
-          });
-  
-          // Send email verification
-          await sendVerificationEmail(user);
-          alert('Please verify your email before continuing.');
-        })
-        .catch((error) => {
-          console.error(error);
-          alert('Sign-up failed. Please try again.');
-        });
-    });
-  
-    // Reset password functionality
-    resetPasswordButton.addEventListener('click', () => {
-      const email = emailInput.value;
-      sendPasswordResetEmail(auth, email)
-        .then(() => {
-          alert('Password reset email sent. Please check your inbox.');
-        })
-        .catch((error) => {
-          console.error(error);
-          alert('Failed to send password reset email.');
-        });
-    });
-  
-    // Sign-out functionality
-    signOutButton.addEventListener('click', () => {
-      signOut(auth)
-        .then(() => {
-          hideChatInterface();
-        })
-        .catch((error) => {
-          console.error(error);
-          alert('Sign-out failed. Please try again.');
-        });
-    });
-  
-    // Change name functionality
-    changeNameButton.addEventListener('click', () => {
-      document.querySelector('.profile-menu').style.display = 'block';
-    });
-  
-    saveNameButton.addEventListener('click', async () => {
-      const newName = newNameInput.value.trim();
-      if (newName) {
-        try {
-          // Update display name in Firebase Authentication
-          await updateProfile(auth.currentUser, { displayName: newName });
-  
-          // Update name in Firestore
-          const userDocRef = doc(db, "users", auth.currentUser.uid);
-          await updateDoc(userDocRef, { name: newName });
-  
-          alert('Name updated successfully');
-          document.querySelector('.profile-menu').style.display = 'none';
-          newNameInput.value = '';
-        } catch (error) {
-          console.error('Error updating name:', error);
-          alert('Failed to update name. Please try again.');
-        }
-      } else {
-        alert('Please enter a new name.');
-      }
-    });
-  
-    // Detect sign-in state
-    onAuthStateChanged(auth, (user) => {
-      if (user) {
-        showChatInterface();
-        initializeChat(user.displayName || 'Anonymous');
-      } else {
-        hideChatInterface();
-      }
-    });
-  
-    // Show/hide chat interface
-    function showChatInterface() {
-      document.querySelector('.sign-in-container').style.display = 'none';
-      document.querySelector('.name-input').style.display = 'block';
-      document.querySelector('.chat-input').style.display = 'flex';
-    }
-  
-    function hideChatInterface() {
-      document.querySelector('.sign-in-container').style.display = 'block';
-      document.querySelector('.name-input').style.display = 'none';
-      document.querySelector('.chat-input').style.display = 'none';
-    }
-  </script>
-  
+  <!-- Import JavaScript modules -->
+  <script type="module" src="firebase.js"></script>
+  <script type="module" src="chat.js"></script>
+  <script type="module" src="utils.js"></script>
+  <script type="module" src="script.js"></script>
 </body>
 </html>
