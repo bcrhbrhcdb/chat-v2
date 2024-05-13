@@ -1,4 +1,4 @@
-import { sendEmailVerification, sendPasswordResetEmail } from "firebase/auth";
+import { sendEmailVerification } from "firebase/auth";
 import { auth } from "./firebase.js";
 
 export const sendVerificationEmail = async (user) => {
@@ -23,7 +23,7 @@ export const sendPasswordResetEmail = async (email) => {
       handleCodeInApp: true,
     };
 
-    await firebase.auth().sendPasswordResetEmail(email, actionCodeSettings);
+    await auth.sendPasswordResetEmail(email, actionCodeSettings);
 
     console.log(`Password reset email sent to ${email}`);
   } catch (error) {
