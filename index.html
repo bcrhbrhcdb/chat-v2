@@ -68,15 +68,14 @@ import { doc, setDoc, updateDoc, collection, addDoc, query, orderBy, onSnapshot,
         email: user.email || null,
       });
 
-      // Show chat interface
-      showChatInterface();
       // Initialize chat functionality
-      initializeChat(specifiedUsername);
+      initializeChat(specifiedUsername, true);
     } catch (error) {
       console.error('Error signing in:', error);
     }
   } else {
     alert('Please enter a username to join the chat.');
+    initializeChat(null, false); // Hide the chat container
   }
 });
 
@@ -183,22 +182,25 @@ async function updateName() {
 
       // Update chat messages with the new name
       const messagesCollection = collection(db, 'messages');
-      const messagesQuery = query(messagesCollection, where('user', '==', auth.currentUser.displayName));
-      const querySnapshot = await getDocs(messagesQuery);
+      const oldName = auth.currentUser.displayName;
       const batch = writeBatch(db);
 
+      const querySnapshot = await getDocs(query(messagesCollection, where('user', '==', oldName)));
       querySnapshot.forEach((doc) => {
         batch.update(doc.ref, { user: newName });
       });
 
       await batch.commit();
 
-      alert('Name updated successfully');
-      document.querySelector('.profile-menu').style.display = 'none';
-      newNameInput.value = '';
+      // Clear the chat container
+      chatMessagesContainer.innerHTML = '';
 
       // Refresh the chat interface with the new name
       initializeChat(newName);
+
+      alert('Name updated successfully');
+      document.querySelector('.profile-menu').style.display = 'none';
+      newNameInput.value = '';
     } catch (error) {
       console.error('Error updating name:', error);
       alert('Failed to update name. Please try again.');
