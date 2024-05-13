@@ -1,5 +1,6 @@
 import { sendEmailVerification, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/9.0.2/firebase-auth.js";
 import { auth, firebaseConfig } from "./firebase.js";
+import { API_KEY } from './config.js';
 
 export const sendVerificationEmail = async (user) => {
   try {
@@ -14,7 +15,7 @@ export const sendVerificationEmail = async (user) => {
 
     const actionCode = await sendEmailVerification(user, actionCodeSettings);
 
-    const verificationLink = `https://chatroom-50dfb.firebaseapp.com/__/auth/action?mode=verifyEmail&oobCode=${actionCode}&apiKey=${firebaseConfig.apiKey}`;
+    const verificationLink = `https://chatroom-50dfb.firebaseapp.com/__/auth/action?mode=verifyEmail&oobCode=${actionCode}&apiKey=${API_KEY}`;
 
     const emailTemplate = `From: Noobs-Inc@chatroom-50dfb.firebaseapp.com
 Reply to: noreply
@@ -50,7 +51,7 @@ export const sendPasswordResetEmail = async (email) => {
 
     const actionCode = await sendPasswordResetEmail(auth, email, actionCodeSettings);
 
-    const resetLink = `https://chatroom-50dfb.firebaseapp.com/__/auth/action?mode=resetPassword&oobCode=${actionCode}&apiKey=${firebaseConfig.apiKey}`;
+    const resetLink = `https://chatroom-50dfb.firebaseapp.com/__/auth/action?mode=resetPassword&oobCode=${actionCode}&apiKey=${API_KEY}`;
 
     const emailTemplate = `Sender name: Noobs-Inc
 From: Noobs-inc@chatroom-50dfb.firebaseapp.com

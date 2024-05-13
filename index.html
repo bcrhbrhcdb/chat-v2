@@ -41,10 +41,10 @@
   <!-- Import the auth object from firebase.js -->
   <script type="module">
     import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, sendPasswordResetEmail, updateProfile } from "https://www.gstatic.com/firebasejs/9.0.2/firebase-auth.js";
-    import { auth, db } from './firebase.js';
-    import { initializeChat } from './chat.js';
-    import { doc, setDoc, updateDoc } from "https://www.gstatic.com/firebasejs/9.0.2/firebase-firestore.js";
-    import { sendVerificationEmail } from './utils.js';
+  import { auth, db } from './firebase.js';
+  import { initializeChat } from './chat.js';
+  import { doc, setDoc, updateDoc } from "https://www.gstatic.com/firebasejs/9.0.2/firebase-firestore.js";
+  import { sendVerificationEmail } from './utils.js'; // Import the sendVerificationEmail function
   
     // Get references to DOM elements
     const emailInput = document.getElementById('email-input');
