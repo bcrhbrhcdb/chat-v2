@@ -56,11 +56,11 @@ import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, si
 
     // Handle join button click
     joinButton.addEventListener('click', async () => {
-  const specifiedUsername = nameInput.value.trim();
+  const specifiedUsername = prompt('Please enter a username:');
   if (specifiedUsername) {
     try {
       // Sign in anonymously
-      const userCredential = await signInAnonymously(auth);
+      const userCredential = await auth.signInAnonymously();
       const user = userCredential.user;
 
       // Create a new user document in Firestore
@@ -77,9 +77,10 @@ import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, si
       console.error('Error signing in:', error);
     }
   } else {
-    alert('Please enter a username.');
+    alert('Please enter a username to join the chat.');
   }
 });
+
 
     // Sign-in functionality
     signInButton.addEventListener('click', () => {
@@ -107,27 +108,31 @@ import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, si
 
     // Sign-up functionality
     signUpButton.addEventListener('click', () => {
-      const email = emailInput.value;
-      const password = passwordInput.value;
-      createUserWithEmailAndPassword(auth, email, password)
-        .then(async (userCredential) => {
-          const user = userCredential.user;
+  const email = emailInput.value;
+  const password = passwordInput.value;
+  createUserWithEmailAndPassword(auth, email, password)
+    .then(async (userCredential) => {
+      const user = userCredential.user;
 
-          // Create a new user document in Firestore
-          await setDoc(doc(db, "users", user.uid), {
-            name: user.displayName || 'Anonymous',
-            email: user.email,
-          });
+      // Set the user's display name
+      await updateProfile(user, { displayName: 'Anonymous' });
 
-          // Send email verification
-          await sendVerificationEmail(user);
-          alert('Please verify your email before continuing.');
-        })
-        .catch((error) => {
-          console.error(error);
-          alert('Sign-up failed. Please try again.');
-        });
+      // Create a new user document in Firestore
+      await setDoc(doc(db, "users", user.uid), {
+        name: 'Anonymous',
+        email: user.email,
+      });
+
+      // Send email verification
+      await sendVerificationEmail(user);
+      alert('Please verify your email before continuing.');
+    })
+    .catch((error) => {
+      console.error(error);
+      alert('Sign-up failed. Please try again.');
     });
+});
+
 
     // Reset password functionality
     resetPasswordButton.addEventListener('click', () => {
@@ -163,21 +168,19 @@ import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, si
   const newName = newNameInput.value.trim();
   if (newName) {
     try {
-      // Check if the user is authenticated
-      if (auth.currentUser) {
-        // Update display name in Firebase Authentication
-        await updateProfile(auth.currentUser, { displayName: newName });
+      // Update display name in Firebase Authentication
+      await updateProfile(auth.currentUser, { displayName: newName });
 
-        // Update name in Firestore
-        const userDocRef = doc(db, "users", auth.currentUser.uid);
-        await updateDoc(userDocRef, { name: newName });
+      // Update name in Firestore
+      const userDocRef = doc(db, "users", auth.currentUser.uid);
+      await updateDoc(userDocRef, { name: newName });
 
-        alert('Name updated successfully');
-        document.querySelector('.profile-menu').style.display = 'none';
-        newNameInput.value = '';
-      } else {
-        alert('You must be signed in to update your name.');
-      }
+      alert('Name updated successfully');
+      document.querySelector('.profile-menu').style.display = 'none';
+      newNameInput.value = '';
+
+      // Refresh the chat interface with the new name
+      initializeChat(newName);
     } catch (error) {
       console.error('Error updating name:', error);
       alert('Failed to update name. Please try again.');

@@ -19,6 +19,16 @@ export function initializeChat(username) {
     });
   });
 
+  // Listen for user changes
+  const usersCollection = collection(db, 'users');
+  const usersQuery = query(usersCollection);
+  onSnapshot(usersQuery, (snapshot) => {
+    const users = snapshot.docs.map((doc) => doc.data().name);
+    const userList = document.createElement('div');
+    userList.textContent = `Users online: ${users.join(', ')}`;
+    chatMessagesContainer.appendChild(userList);
+  });
+
   // Send message
   sendButton.addEventListener('click', async () => {
     const message = messageInput.value.trim();
