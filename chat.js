@@ -14,12 +14,21 @@ export function initializeChat(username) {
     snapshot.forEach((doc) => {
       const message = doc.data();
       const messageElement = document.createElement('div');
-      messageElement.textContent = `${message.user}: ${message.message}`;
 
-      // Check if the message contains profanity
-      const containsProfanity = message.message.toLowerCase().includes('profanity');
+      // Create a span element for the username and date
+      const userNameDateSpan = document.createElement('span');
+      userNameDateSpan.textContent = `${message.user} (${new Date(message.created.toDate()).toLocaleString()})`;
+
+      // Create a span element for the message content
+      const messageContentSpan = document.createElement('span');
+      messageContentSpan.textContent = `: ${message.message}`;
+
+      // Append the username/date and message content spans to the message element
+      messageElement.appendChild(userNameDateSpan);
+      messageElement.appendChild(messageContentSpan);
 
       // Only append the message element if it doesn't contain profanity
+      const containsProfanity = message.message.toLowerCase().includes('profanity');
       if (!containsProfanity) {
         chatMessagesContainer.appendChild(messageElement);
       }
