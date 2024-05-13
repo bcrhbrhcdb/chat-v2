@@ -8,29 +8,37 @@ export function initializeChat(username) {
   const messageInput = document.getElementById('message-input');
   const sendButton = document.getElementById('send-button');
 
+  // Check if the user is verified
+  const user = auth.currentUser;
+  if (!user || !user.emailVerified) {
+    alert('Please verify your email before joining the chat.');
+    return;
+  }
+
   // Listen for new messages and filter out profanity
   const unsubscribe = onSnapshot(messagesQuery, (snapshot) => {
-    chatMessagesContainer.innerHTML = '';
-    snapshot.forEach((doc) => {
-      const message = doc.data();
-      const messageElement = document.createElement('div');
+    snapshot.docChanges().forEach((change) => {
+      if (change.type === 'added') {
+        const message = change.doc.data();
+        const messageElement = document.createElement('div');
 
-      // Create a span element for the username and date
-      const userNameDateSpan = document.createElement('span');
-      userNameDateSpan.textContent = `${message.user} (${new Date(message.created.toDate()).toLocaleString()})`;
+        // Create a span element for the username and date
+        const userNameDateSpan = document.createElement('span');
+        userNameDateSpan.textContent = `${message.user} (${new Date(message.created.toDate()).toLocaleString()})`;
 
-      // Create a span element for the message content
-      const messageContentSpan = document.createElement('span');
-      messageContentSpan.textContent = `: ${message.message}`;
+        // Create a span element for the message content
+        const messageContentSpan = document.createElement('span');
+        messageContentSpan.textContent = `: ${message.message}`;
 
-      // Append the username/date and message content spans to the message element
-      messageElement.appendChild(userNameDateSpan);
-      messageElement.appendChild(messageContentSpan);
+        // Append the username/date and message content spans to the message element
+        messageElement.appendChild(userNameDateSpan);
+        messageElement.appendChild(messageContentSpan);
 
-      // Only append the message element if it doesn't contain profanity
-      const containsProfanity = message.message.toLowerCase().includes('profanity');
-      if (!containsProfanity) {
-        chatMessagesContainer.appendChild(messageElement);
+        // Only append the message element if it doesn't contain profanity
+        const containsProfanity = message.message.toLowerCase().includes('profanity');
+        if (!containsProfanity) {
+          chatMessagesContainer.appendChild(messageElement);
+        }
       }
     });
   });
