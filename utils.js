@@ -1,6 +1,5 @@
-import { sendEmailVerification, sendPasswordResetEmail } from "firebase/auth";
-import { auth } from "./firebase.js";
-import { firebaseConfig } from "./firebase.js";
+import { sendEmailVerification, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/9.0.2/firebase-auth.js";
+import { auth, firebaseConfig } from "./firebase.js";
 
 export const sendVerificationEmail = async (user) => {
   try {
