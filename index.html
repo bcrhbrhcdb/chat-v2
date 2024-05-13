@@ -40,11 +40,12 @@
 
   <!-- Import the auth object from firebase.js -->
   <script type="module">
-    import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, sendPasswordResetEmail, sendEmailVerification, updateProfile } from "https://www.gstatic.com/firebasejs/9.0.2/firebase-auth.js";
+    import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, sendPasswordResetEmail, updateProfile } from "https://www.gstatic.com/firebasejs/9.0.2/firebase-auth.js";
     import { auth, db } from './firebase.js';
     import { initializeChat } from './chat.js';
     import { doc, setDoc, updateDoc } from "https://www.gstatic.com/firebasejs/9.0.2/firebase-firestore.js";
-
+    import { sendVerificationEmail } from './utils.js';
+  
     // Get references to DOM elements
     const emailInput = document.getElementById('email-input');
     const passwordInput = document.getElementById('password-input');
@@ -57,7 +58,7 @@
     const changeNameButton = document.getElementById('change-name-button');
     const newNameInput = document.getElementById('new-name-input');
     const saveNameButton = document.getElementById('save-name-button');
-
+  
     // Handle join button click
     joinButton.addEventListener('click', async () => {
       const specifiedUsername = nameInput.value.trim();
@@ -66,13 +67,13 @@
           // Sign in anonymously
           const userCredential = await auth.signInAnonymously();
           const user = userCredential.user;
-
+  
           // Create a new user document in Firestore
           await setDoc(doc(db, "users", user.uid), {
             name: specifiedUsername,
             email: user.email || null,
           });
-
+  
           // Show chat interface
           showChatInterface();
           // Initialize chat functionality
@@ -84,7 +85,7 @@
         alert('Please enter a username.');
       }
     });
-
+  
     // Sign-in functionality
     signInButton.addEventListener('click', () => {
       const email = emailInput.value;
@@ -92,10 +93,10 @@
       signInWithEmailAndPassword(auth, email, password)
         .then(async (userCredential) => {
           const user = userCredential.user;
-
+  
           // Check if the user's email is verified
           if (!user.emailVerified) {
-            await sendEmailVerification(user);
+            await sendVerificationEmail(user); // Send email verification
             alert('Please verify your email before continuing.');
           } else {
             showChatInterface();
@@ -107,7 +108,7 @@
           alert('Sign-in failed. Please check your credentials.');
         });
     });
-
+  
     // Sign-up functionality
     signUpButton.addEventListener('click', () => {
       const email = emailInput.value;
@@ -115,15 +116,15 @@
       createUserWithEmailAndPassword(auth, email, password)
         .then(async (userCredential) => {
           const user = userCredential.user;
-
+  
           // Create a new user document in Firestore
           await setDoc(doc(db, "users", user.uid), {
             name: user.displayName || 'Anonymous',
             email: user.email,
           });
-
+  
           // Send email verification
-          await sendEmailVerification(user);
+          await sendVerificationEmail(user);
           alert('Please verify your email before continuing.');
         })
         .catch((error) => {
@@ -131,7 +132,7 @@
           alert('Sign-up failed. Please try again.');
         });
     });
-
+  
     // Reset password functionality
     resetPasswordButton.addEventListener('click', () => {
       const email = emailInput.value;
@@ -144,7 +145,7 @@
           alert('Failed to send password reset email.');
         });
     });
-
+  
     // Sign-out functionality
     signOutButton.addEventListener('click', () => {
       signOut(auth)
@@ -156,23 +157,23 @@
           alert('Sign-out failed. Please try again.');
         });
     });
-
+  
     // Change name functionality
     changeNameButton.addEventListener('click', () => {
       document.querySelector('.profile-menu').style.display = 'block';
     });
-
+  
     saveNameButton.addEventListener('click', async () => {
       const newName = newNameInput.value.trim();
       if (newName) {
         try {
           // Update display name in Firebase Authentication
           await updateProfile(auth.currentUser, { displayName: newName });
-
+  
           // Update name in Firestore
           const userDocRef = doc(db, "users", auth.currentUser.uid);
           await updateDoc(userDocRef, { name: newName });
-
+  
           alert('Name updated successfully');
           document.querySelector('.profile-menu').style.display = 'none';
           newNameInput.value = '';
@@ -184,7 +185,7 @@
         alert('Please enter a new name.');
       }
     });
-
+  
     // Detect sign-in state
     onAuthStateChanged(auth, (user) => {
       if (user) {
@@ -194,19 +195,20 @@
         hideChatInterface();
       }
     });
-
+  
     // Show/hide chat interface
     function showChatInterface() {
       document.querySelector('.sign-in-container').style.display = 'none';
       document.querySelector('.name-input').style.display = 'block';
       document.querySelector('.chat-input').style.display = 'flex';
     }
-
+  
     function hideChatInterface() {
       document.querySelector('.sign-in-container').style.display = 'block';
       document.querySelector('.name-input').style.display = 'none';
       document.querySelector('.chat-input').style.display = 'none';
     }
   </script>
+  
 </body>
 </html>
