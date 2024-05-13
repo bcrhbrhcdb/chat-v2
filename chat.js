@@ -1,7 +1,7 @@
 import { getFirestore, collection, addDoc, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/9.0.2/firebase-firestore.js";
 import { auth, db } from './firebase.js';
 
-export function initializeChat(username) {
+export function initializeChat(username, showChat = true) {
   const messagesCollection = collection(db, 'messages');
   const messagesQuery = query(messagesCollection, orderBy('created', 'asc'));
   const chatMessagesContainer = document.getElementById('chat-messages');
@@ -13,6 +13,13 @@ export function initializeChat(username) {
   if (!user || !user.emailVerified) {
     alert('Please verify your email before joining the chat.');
     return;
+  }
+
+  // Show or hide the chat interface
+  if (showChat) {
+    document.querySelector('.chat-container').style.display = 'block';
+  } else {
+    document.querySelector('.chat-container').style.display = 'none';
   }
 
   // Listen for new messages and filter out profanity
