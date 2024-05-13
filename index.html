@@ -35,26 +35,27 @@
   <!-- Import the auth object from firebase.js -->
   <script type="module">
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, sendPasswordResetEmail, updateProfile, signInAnonymously } from "https://www.gstatic.com/firebasejs/9.0.2/firebase-auth.js";
-    import { auth, db } from './firebase.js';
-    import { initializeChat } from './chat.js';
+import { auth, db } from './firebase.js';
+import { initializeChat } from './chat.js';
 import { doc, setDoc, updateDoc, collection, addDoc, query, orderBy, onSnapshot, getDocs, where, writeBatch } from "https://www.gstatic.com/firebasejs/9.0.2/firebase-firestore.js";
-    import { sendVerificationEmail } from './utils.js';
-    // Get references to DOM elements
-    const emailInput = document.getElementById('email-input');
-    const passwordInput = document.getElementById('password-input');
-    const signInButton = document.getElementById('sign-in-button');
-    const signUpButton = document.getElementById('sign-up-button');
-    const resetPasswordButton = document.getElementById('reset-password-button');
-    const nameInput = document.getElementById('name-input');
-    const joinButton = document.getElementById('join-button');
-    const chatMessagesContainer = document.getElementById('chat-messages');
-    const changeNameButton = document.getElementById('change-name-button');
-    const newNameInput = document.getElementById('new-name-input');
-    const saveNameButton = document.getElementById('save-name-button');
-    const signOutButton = document.getElementById('sign-out-button');
+import { sendVerificationEmail } from './utils.js';
 
-    // Handle join button click
-    joinButton.addEventListener('click', async () => {
+// Get references to DOM elements
+const emailInput = document.getElementById('email-input');
+const passwordInput = document.getElementById('password-input');
+const signInButton = document.getElementById('sign-in-button');
+const signUpButton = document.getElementById('sign-up-button');
+const resetPasswordButton = document.getElementById('reset-password-button');
+const nameInput = document.getElementById('name-input');
+const joinButton = document.getElementById('join-button');
+const chatMessagesContainer = document.getElementById('chat-messages');
+const changeNameButton = document.getElementById('change-name-button');
+const newNameInput = document.getElementById('new-name-input');
+const saveNameButton = document.getElementById('save-name-button');
+const signOutButton = document.getElementById('sign-out-button');
+
+// Handle join button click
+joinButton.addEventListener('click', async () => {
   const specifiedUsername = prompt('Please enter a username:');
   if (specifiedUsername) {
     try {
@@ -79,24 +80,20 @@ import { doc, setDoc, updateDoc, collection, addDoc, query, orderBy, onSnapshot,
   }
 });
 
-
-    // Sign-in functionality
-    signInButton.addEventListener('click', () => {
+// Sign-in functionality
+signInButton.addEventListener('click', () => {
   const email = emailInput.value;
   const password = passwordInput.value;
-
-  // Check if the user's email is already verified
-  const user = auth.currentUser;
-  if (user && !user.emailVerified) {
-    alert('Please verify your email before signing in.');
-    return;
-  }
 
   signInWithEmailAndPassword(auth, email, password)
     .then((userCredential) => {
       const user = userCredential.user;
-      showChatInterface();
-      initializeChat(user.displayName || 'Anonymous');
+      if (user.emailVerified) {
+        initializeChat(user.displayName || 'Anonymous', true);
+      } else {
+        alert('Please verify your email before joining the chat.');
+        initializeChat(null, false); // Hide the chat container
+      }
     })
     .catch((error) => {
       console.error(error);
@@ -104,8 +101,8 @@ import { doc, setDoc, updateDoc, collection, addDoc, query, orderBy, onSnapshot,
     });
 });
 
-    // Sign-up functionality
-    signUpButton.addEventListener('click', () => {
+// Sign-up functionality
+signUpButton.addEventListener('click', () => {
   const email = emailInput.value;
   const password = passwordInput.value;
   createUserWithEmailAndPassword(auth, email, password)
@@ -124,6 +121,7 @@ import { doc, setDoc, updateDoc, collection, addDoc, query, orderBy, onSnapshot,
       // Send email verification
       await sendVerificationEmail(user);
       alert('Please verify your email before continuing.');
+      initializeChat(null, false); // Hide the chat container
     })
     .catch((error) => {
       console.error(error);
@@ -131,38 +129,37 @@ import { doc, setDoc, updateDoc, collection, addDoc, query, orderBy, onSnapshot,
     });
 });
 
-
-    // Reset password functionality
-    resetPasswordButton.addEventListener('click', () => {
-      const email = emailInput.value;
-      sendPasswordResetEmail(auth, email)
-        .then(() => {
-          alert('Password reset email sent. Please check your inbox.');
-        })
-        .catch((error) => {
-          console.error(error);
-          alert('Failed to send password reset email.');
-        });
+// Reset password functionality
+resetPasswordButton.addEventListener('click', () => {
+  const email = emailInput.value;
+  sendPasswordResetEmail(auth, email)
+    .then(() => {
+      alert('Password reset email sent. Please check your inbox.');
+    })
+    .catch((error) => {
+      console.error(error);
+      alert('Failed to send password reset email.');
     });
+});
 
-    // Sign-out functionality
-    signOutButton.addEventListener('click', () => {
-      signOut(auth)
-        .then(() => {
-          hideChatInterface();
-        })
-        .catch((error) => {
-          console.error(error);
-          alert('Sign-out failed. Please try again.');
-        });
+// Sign-out functionality
+signOutButton.addEventListener('click', () => {
+  signOut(auth)
+    .then(() => {
+      hideChatInterface();
+    })
+    .catch((error) => {
+      console.error(error);
+      alert('Sign-out failed. Please try again.');
     });
+});
 
-    // Change name functionality
-    changeNameButton.addEventListener('click', () => {
-      document.querySelector('.profile-menu').style.display = 'block';
-    });
+// Change name functionality
+changeNameButton.addEventListener('click', () => {
+  document.querySelector('.profile-menu').style.display = 'block';
+});
 
-    saveNameButton.addEventListener('click', updateName);
+saveNameButton.addEventListener('click', updateName);
 newNameInput.addEventListener('keydown', (event) => {
   if (event.key === 'Enter') {
     updateName();
@@ -192,11 +189,8 @@ async function updateName() {
 
       await batch.commit();
 
-      // Clear the chat container
-      chatMessagesContainer.innerHTML = '';
-
       // Refresh the chat interface with the new name
-      initializeChat(newName);
+      initializeChat(newName, true);
 
       alert('Name updated successfully');
       document.querySelector('.profile-menu').style.display = 'none';
@@ -210,35 +204,30 @@ async function updateName() {
   }
 }
 
+// Detect sign-in state
+onAuthStateChanged(auth, (user) => {
+  if (user && user.emailVerified) {
+    initializeChat(user.displayName || 'Anonymous', true);
+  } else {
+    hideChatInterface();
+  }
+});
 
+// Show/hide chat interface
+function showChatInterface() {
+  document.querySelector('.sign-in-container').style.display = 'none';
+  document.querySelector('.name-input').style.display = 'block';
+  document.querySelector('.chat-input').style.display = 'flex';
+}
 
+function hideChatInterface() {
+  document.querySelector('.sign-in-container').style.display = 'block';
+  document.querySelector('.name-input').style.display = 'none';
+  document.querySelector('.chat-input').style.display = 'none';
+}
 
-
-    // Detect sign-in state
-    onAuthStateChanged(auth, (user) => {
-      if (user) {
-        showChatInterface();
-        initializeChat(user.displayName || 'Anonymous');
-      } else {
-        hideChatInterface();
-      }
-    });
-
-    // Show/hide chat interface
-    function showChatInterface() {
-      document.querySelector('.sign-in-container').style.display = 'none';
-      document.querySelector('.name-input').style.display = 'block';
-      document.querySelector('.chat-input').style.display = 'flex';
-    }
-
-    function hideChatInterface() {
-      document.querySelector('.sign-in-container').style.display = 'block';
-      document.querySelector('.name-input').style.display = 'none';
-      document.querySelector('.chat-input').style.display = 'none';
-    }
-
-    const signInAnonymouslyButton = document.getElementById('sign-in-anonymously-button');
-    signInAnonymouslyButton.addEventListener('click', () => {
+const signInAnonymouslyButton = document.getElementById('sign-in-anonymously-button');
+signInAnonymouslyButton.addEventListener('click', () => {
   const email = emailInput.value;
   const password = passwordInput.value;
 
@@ -256,7 +245,7 @@ async function updateName() {
         // Show chat interface
         showChatInterface();
         // Initialize chat functionality
-        initializeChat('Anonymous');
+        initializeChat('Anonymous', true);
       })
       .catch((error) => {
         console.error(error);
@@ -266,6 +255,7 @@ async function updateName() {
     alert('Please enter an email and password.');
   }
 });
+
 
 
   </script>
