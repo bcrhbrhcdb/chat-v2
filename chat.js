@@ -18,6 +18,7 @@ export function initializeChat(username) {
       chatMessagesContainer.appendChild(messageElement);
     });
   });
+4
 
   // Send message
   sendButton.addEventListener('click', async () => {
