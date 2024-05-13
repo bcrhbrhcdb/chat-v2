@@ -12,6 +12,7 @@
       <input type="email" placeholder="Email" id="email-input">
       <input type="password" placeholder="Password" id="password-input">
       <button id="sign-in-button">Sign In</button>
+      <button id="sign-in-anonymously-button">Sign In Anonymously</button>
       <button id="sign-up-button">Sign Up</button>
       <button id="reset-password-button">Reset Password</button>
     </div>
@@ -25,7 +26,6 @@
       <button id="send-button">Send</button>
       <button id="change-name-button">Change Name</button>
       <button id="sign-out-button">Sign Out</button>
-
     </div>    
     <div class="profile-menu" style="display: none;">
       <input type="text" placeholder="Enter new name..." id="new-name-input">
@@ -213,6 +213,29 @@ import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, si
       document.querySelector('.name-input').style.display = 'none';
       document.querySelector('.chat-input').style.display = 'none';
     }
+
+    const signInAnonymouslyButton = document.getElementById('sign-in-anonymously-button');
+    signInAnonymouslyButton.addEventListener('click', async () => {
+  try {
+    const userCredential = await signInAnonymously(auth);
+    const user = userCredential.user;
+
+    // Optionally, you can create a new user document in Firestore
+    await setDoc(doc(db, "users", user.uid), {
+      name: 'Anonymous',
+      email: null,
+    });
+
+    // Show chat interface
+    showChatInterface();
+    // Initialize chat functionality
+    initializeChat('Anonymous');
+  } catch (error) {
+    console.error('Error signing in anonymously:', error);
+    alert('Failed to sign in anonymously. Please try again.');
+  }
+});
+
   </script>
 </body>
 </html>
