@@ -1,5 +1,5 @@
 import { getFirestore, collection, addDoc, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/9.0.2/firebase-firestore.js";
-import { db } from './firebase.js';
+import { auth, db } from './firebase.js';
 
 export function initializeChat(username) {
   const messagesCollection = collection(db, 'messages');
@@ -18,7 +18,6 @@ export function initializeChat(username) {
       chatMessagesContainer.appendChild(messageElement);
     });
   });
-4
 
   // Send message
   sendButton.addEventListener('click', async () => {
