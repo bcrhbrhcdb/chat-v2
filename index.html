@@ -175,6 +175,18 @@ import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, si
       const userDocRef = doc(db, "users", auth.currentUser.uid);
       await updateDoc(userDocRef, { name: newName });
 
+      // Update chat messages with the new name
+      const messagesCollection = collection(db, 'messages');
+      const messagesQuery = query(messagesCollection, where('user', '==', auth.currentUser.displayName));
+      const querySnapshot = await getDocs(messagesQuery);
+      const batch = writeBatch(db);
+
+      querySnapshot.forEach((doc) => {
+        batch.update(doc.ref, { user: newName });
+      });
+
+      await batch.commit();
+
       alert('Name updated successfully');
       document.querySelector('.profile-menu').style.display = 'none';
       newNameInput.value = '';
@@ -189,6 +201,7 @@ import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, si
     alert('Please enter a new name.');
   }
 });
+
 
 
     // Detect sign-in state
@@ -215,26 +228,35 @@ import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, si
     }
 
     const signInAnonymouslyButton = document.getElementById('sign-in-anonymously-button');
-    signInAnonymouslyButton.addEventListener('click', async () => {
-  try {
-    const userCredential = await signInAnonymously(auth);
-    const user = userCredential.user;
+    signInAnonymouslyButton.addEventListener('click', () => {
+  const email = emailInput.value;
+  const password = passwordInput.value;
 
-    // Optionally, you can create a new user document in Firestore
-    await setDoc(doc(db, "users", user.uid), {
-      name: 'Anonymous',
-      email: null,
-    });
+  if (email && password) {
+    createUserWithEmailAndPassword(auth, email, password)
+      .then(async (userCredential) => {
+        const user = userCredential.user;
 
-    // Show chat interface
-    showChatInterface();
-    // Initialize chat functionality
-    initializeChat('Anonymous');
-  } catch (error) {
-    console.error('Error signing in anonymously:', error);
-    alert('Failed to sign in anonymously. Please try again.');
+        // Create a new user document in Firestore
+        await setDoc(doc(db, "users", user.uid), {
+          name: 'Anonymous',
+          email: user.email,
+        });
+
+        // Show chat interface
+        showChatInterface();
+        // Initialize chat functionality
+        initializeChat('Anonymous');
+      })
+      .catch((error) => {
+        console.error(error);
+        alert('Sign-in failed. Please try again.');
+      });
+  } else {
+    alert('Please enter an email and password.');
   }
 });
+
 
   </script>
 </body>
