@@ -1,3 +1,6 @@
+import { auth, db, collection } from './firebase.js';
+import { query, orderBy, onSnapshot, addDoc } from "firebase/firestore";
+
 export function initializeChat(username, showChat = true) {
   const messagesCollection = collection(db, 'messages');
   const messagesQuery = query(messagesCollection, orderBy('created', 'asc'));
@@ -74,4 +77,29 @@ export function initializeChat(username, showChat = true) {
       }
     }
   }
+}
+
+// Function to show the verification popup
+function showPopup() {
+  const popup = document.createElement('div');
+  popup.classList.add('popup');
+  popup.innerHTML = `
+    <div class="popup-content">
+      <span class="close-button">&times;</span>
+      <p>Please verify your email before joining the chat.</p>
+    </div>
+  `;
+
+  document.body.appendChild(popup);
+
+  const closeButton = popup.querySelector('.close-button');
+  closeButton.addEventListener('click', () => {
+    popup.remove();
+  });
+
+  window.addEventListener('click', (event) => {
+    if (event.target === popup) {
+      popup.remove();
+    }
+  });
 }
