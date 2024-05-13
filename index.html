@@ -160,27 +160,33 @@ import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, si
     });
 
     saveNameButton.addEventListener('click', async () => {
-      const newName = newNameInput.value.trim();
-      if (newName) {
-        try {
-          // Update display name in Firebase Authentication
-          await updateProfile(auth.currentUser, { displayName: newName });
+  const newName = newNameInput.value.trim();
+  if (newName) {
+    try {
+      // Check if the user is authenticated
+      if (auth.currentUser) {
+        // Update display name in Firebase Authentication
+        await updateProfile(auth.currentUser, { displayName: newName });
 
-          // Update name in Firestore
-          const userDocRef = doc(db, "users", auth.currentUser.uid);
-          await updateDoc(userDocRef, { name: newName });
+        // Update name in Firestore
+        const userDocRef = doc(db, "users", auth.currentUser.uid);
+        await updateDoc(userDocRef, { name: newName });
 
-          alert('Name updated successfully');
-          document.querySelector('.profile-menu').style.display = 'none';
-          newNameInput.value = '';
-        } catch (error) {
-          console.error('Error updating name:', error);
-          alert('Failed to update name. Please try again.');
-        }
+        alert('Name updated successfully');
+        document.querySelector('.profile-menu').style.display = 'none';
+        newNameInput.value = '';
       } else {
-        alert('Please enter a new name.');
+        alert('You must be signed in to update your name.');
       }
-    });
+    } catch (error) {
+      console.error('Error updating name:', error);
+      alert('Failed to update name. Please try again.');
+    }
+  } else {
+    alert('Please enter a new name.');
+  }
+});
+
 
     // Detect sign-in state
     onAuthStateChanged(auth, (user) => {
