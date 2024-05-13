@@ -34,7 +34,7 @@
 
   <!-- Import the auth object from firebase.js -->
   <script type="module">
-    import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, sendPasswordResetEmail, updateProfile } from "https://www.gstatic.com/firebasejs/9.0.2/firebase-auth.js";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, sendPasswordResetEmail, updateProfile, signInAnonymously } from "https://www.gstatic.com/firebasejs/9.0.2/firebase-auth.js";
     import { auth, db } from './firebase.js';
     import { initializeChat } from './chat.js';
     import { doc, setDoc, updateDoc } from "https://www.gstatic.com/firebasejs/9.0.2/firebase-firestore.js";
@@ -56,53 +56,54 @@
 
     // Handle join button click
     joinButton.addEventListener('click', async () => {
-      const specifiedUsername = nameInput.value.trim();
-      if (specifiedUsername) {
-        try {
-          // Sign in anonymously
-          const userCredential = await auth.signInAnonymously();
-          const user = userCredential.user;
+  const specifiedUsername = nameInput.value.trim();
+  if (specifiedUsername) {
+    try {
+      // Sign in anonymously
+      const userCredential = await signInAnonymously(auth);
+      const user = userCredential.user;
 
-          // Create a new user document in Firestore
-          await setDoc(doc(db, "users", user.uid), {
-            name: specifiedUsername,
-            email: user.email || null,
-          });
+      // Create a new user document in Firestore
+      await setDoc(doc(db, "users", user.uid), {
+        name: specifiedUsername,
+        email: user.email || null,
+      });
 
-          // Show chat interface
-          showChatInterface();
-          // Initialize chat functionality
-          initializeChat(specifiedUsername);
-        } catch (error) {
-          console.error('Error signing in:', error);
-        }
-      } else {
-        alert('Please enter a username.');
-      }
-    });
+      // Show chat interface
+      showChatInterface();
+      // Initialize chat functionality
+      initializeChat(specifiedUsername);
+    } catch (error) {
+      console.error('Error signing in:', error);
+    }
+  } else {
+    alert('Please enter a username.');
+  }
+});
 
     // Sign-in functionality
     signInButton.addEventListener('click', () => {
-      const email = emailInput.value;
-      const password = passwordInput.value;
-      signInWithEmailAndPassword(auth, email, password)
-        .then(async (userCredential) => {
-          const user = userCredential.user;
+  const email = emailInput.value;
+  const password = passwordInput.value;
 
-          // Check if the user's email is verified
-          if (!user.emailVerified) {
-            await sendVerificationEmail(user); // Send email verification
-            alert('Please verify your email before continuing.');
-          } else {
-            showChatInterface();
-            initializeChat(user.displayName || 'Anonymous');
-          }
-        })
-        .catch((error) => {
-          console.error(error);
-          alert('Sign-in failed. Please check your credentials.');
-        });
+  // Check if the user's email is already verified
+  const user = auth.currentUser;
+  if (user && !user.emailVerified) {
+    alert('Please verify your email before signing in.');
+    return;
+  }
+
+  signInWithEmailAndPassword(auth, email, password)
+    .then((userCredential) => {
+      const user = userCredential.user;
+      showChatInterface();
+      initializeChat(user.displayName || 'Anonymous');
+    })
+    .catch((error) => {
+      console.error(error);
+      alert('Sign-in failed. Please check your credentials.');
     });
+});
 
     // Sign-up functionality
     signUpButton.addEventListener('click', () => {
