@@ -35,10 +35,13 @@
   <!-- Import the auth object from firebase.js -->
   <script type="module">
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, sendPasswordResetEmail, updateProfile, signInAnonymously } from "https://www.gstatic.com/firebasejs/9.0.2/firebase-auth.js";
-import { auth, db } from './firebase.js';
+import { auth, db, collection } from './firebase.js';
 import { initializeChat } from './chat.js';
-import { doc, setDoc, updateDoc, collection, addDoc, query, orderBy, onSnapshot, getDocs, where, writeBatch } from "https://www.gstatic.com/firebasejs/9.0.2/firebase-firestore.js";
+import { doc, setDoc, updateDoc, query, orderBy, onSnapshot, getDocs, where, writeBatch } from "firebase/firestore";
 import { sendVerificationEmail } from './utils.js';
+
+// ... (rest of the code remains the same)
+
 
 // Get references to DOM elements
 const emailInput = document.getElementById('email-input');
