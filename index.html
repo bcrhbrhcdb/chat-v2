@@ -35,11 +35,13 @@
   <script src="https://www.gstatic.com/firebasejs/9.0.2/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.0.2/firebase-auth.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.0.2/firebase-analytics.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.0.2/firebase-firestore.js"></script>
 
   <!-- Import the auth object from firebase.js -->
   <script type="module">
     import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.0.2/firebase-auth.js";
-    import { auth } from './firebase.js';
+    import { auth, db } from './firebase.js';
+    import { initializeChat } from './chat.js';
 
     // Get references to DOM elements
     const emailInput = document.getElementById('email-input');
@@ -48,12 +50,26 @@
     const signUpButton = document.getElementById('sign-up-button');
     const nameInput = document.getElementById('name-input');
     const joinButton = document.getElementById('join-button');
-    const messageInput = document.getElementById('message-input');
-    const sendButton = document.getElementById('send-button');
-    const changeNameButton = document.getElementById('change-name-button');
-    const signOutButton = document.getElementById('sign-out-button');
-    const newNameInput = document.getElementById('new-name-input');
-    const saveNameButton = document.getElementById('save-name-button');
+    const chatMessagesContainer = document.getElementById('chat-messages');
+
+    // Handle join button click
+    joinButton.addEventListener('click', async () => {
+      const specifiedUsername = nameInput.value.trim();
+      if (specifiedUsername) {
+        try {
+          // Sign in anonymously
+          await auth.signInAnonymously();
+          // Show chat interface
+          showChatInterface();
+          // Initialize chat functionality
+          initializeChat(specifiedUsername);
+        } catch (error) {
+          console.error('Error signing in:', error);
+        }
+      } else {
+        alert('Please enter a username.');
+      }
+    });
 
     // Sign-in functionality
     signInButton.addEventListener('click', () => {
