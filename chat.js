@@ -1,6 +1,3 @@
-import { getFirestore, collection, addDoc, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/9.0.2/firebase-firestore.js";
-import { auth, db } from './firebase.js';
-
 export function initializeChat(username, showChat = true) {
   const messagesCollection = collection(db, 'messages');
   const messagesQuery = query(messagesCollection, orderBy('created', 'asc'));
@@ -12,6 +9,7 @@ export function initializeChat(username, showChat = true) {
   const user = auth.currentUser;
   if (!user || !user.emailVerified) {
     alert('Please verify your email before joining the chat.');
+    showPopup(); // Show the verification popup
     return;
   }
 
@@ -73,4 +71,29 @@ export function initializeChat(username, showChat = true) {
       }
     }
   }
+}
+
+// Function to show the verification popup
+function showPopup() {
+  const popup = document.createElement('div');
+  popup.classList.add('popup');
+  popup.innerHTML = `
+    <div class="popup-content">
+      <span class="close-button">&times;</span>
+      <p>Please verify your email before joining the chat.</p>
+    </div>
+  `;
+
+  document.body.appendChild(popup);
+
+  const closeButton = popup.querySelector('.close-button');
+  closeButton.addEventListener('click', () => {
+    popup.remove();
+  });
+
+  window.addEventListener('click', (event) => {
+    if (event.target === popup) {
+      popup.remove();
+    }
+  });
 }
