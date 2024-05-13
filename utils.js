@@ -8,13 +8,9 @@ export const sendVerificationEmail = async (user) => {
       handleCodeInApp: true,
     };
 
-    const email = user.email;
-    const displayName = user.displayName || 'User';
-    const appName = 'Noobs-inc';
-
     await sendEmailVerification(user, actionCodeSettings);
 
-    console.log(`Email verification sent to ${email}`);
+    console.log(`Email verification sent to ${user.email}`);
   } catch (error) {
     console.error('Error sending email verification:', error);
   }
@@ -27,9 +23,7 @@ export const sendPasswordResetEmail = async (email) => {
       handleCodeInApp: true,
     };
 
-    const appName = 'Noobs-inc';
-
-    await sendPasswordResetEmail(auth, email, actionCodeSettings);
+    await firebase.auth().sendPasswordResetEmail(email, actionCodeSettings);
 
     console.log(`Password reset email sent to ${email}`);
   } catch (error) {
