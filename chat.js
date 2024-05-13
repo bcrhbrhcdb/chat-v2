@@ -36,19 +36,25 @@ export function initializeChat(username) {
   });
 
   // Send message
-  sendButton.addEventListener('click', async () => {
-    const message = messageInput.value.trim();
-    if (message) {
-      try {
-        await addDoc(messagesCollection, {
-          user: username,
-          message,
-          created: new Date(),
-        });
-        messageInput.value = '';
-      } catch (error) {
-        console.error('Error sending message:', error);
-      }
+  sendButton.addEventListener('click', sendMessage);
+messageInput.addEventListener('keydown', (event) => {
+  if (event.key === 'Enter') {
+    sendMessage();
+  }
+});
+
+async function sendMessage() {
+  const message = messageInput.value.trim();
+  if (message) {
+    try {
+      await addDoc(collection(db, 'messages'), {
+        user: auth.currentUser.displayName,
+        message,
+        created: new Date(),
+      });
+      messageInput.value = '';
+    } catch (error) {
+      console.error('Error sending message:', error);
     }
-  });
+  }
 }

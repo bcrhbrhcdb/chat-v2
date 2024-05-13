@@ -17,8 +17,7 @@
       <button id="reset-password-button">Reset Password</button>
     </div>
     <div class="name-input" style="display: none;">
-      <input type="text" placeholder="Enter your name..." id="name-input">
-      <button id="join-button">Join</button>
+      <button id="join-button">Join Now!</button>
     </div>
     <div class="chat-messages" id="chat-messages"></div>
     <div class="chat-input" style="display: none;">
@@ -38,7 +37,7 @@
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, sendPasswordResetEmail, updateProfile, signInAnonymously } from "https://www.gstatic.com/firebasejs/9.0.2/firebase-auth.js";
     import { auth, db } from './firebase.js';
     import { initializeChat } from './chat.js';
-    import { doc, setDoc, updateDoc } from "https://www.gstatic.com/firebasejs/9.0.2/firebase-firestore.js";
+import { doc, setDoc, updateDoc, collection, addDoc, query, orderBy, onSnapshot, getDocs, where, writeBatch } from "https://www.gstatic.com/firebasejs/9.0.2/firebase-firestore.js";
     import { sendVerificationEmail } from './utils.js';
     // Get references to DOM elements
     const emailInput = document.getElementById('email-input');
@@ -164,7 +163,14 @@ import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, si
       document.querySelector('.profile-menu').style.display = 'block';
     });
 
-    saveNameButton.addEventListener('click', async () => {
+    saveNameButton.addEventListener('click', updateName);
+newNameInput.addEventListener('keydown', (event) => {
+  if (event.key === 'Enter') {
+    updateName();
+  }
+});
+
+async function updateName() {
   const newName = newNameInput.value.trim();
   if (newName) {
     try {
@@ -200,7 +206,9 @@ import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, si
   } else {
     alert('Please enter a new name.');
   }
-});
+}
+
+
 
 
 
