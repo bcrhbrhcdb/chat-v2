@@ -8,25 +8,20 @@ export function initializeChat(username) {
   const messageInput = document.getElementById('message-input');
   const sendButton = document.getElementById('send-button');
 
-  // Listen for new messages
-  onSnapshot(messagesQuery, (snapshot) => {
+  // Listen for new messages and automatically filter
+  const unsubscribe = onSnapshot(messagesQuery, (snapshot) => {
     chatMessagesContainer.innerHTML = '';
     snapshot.forEach((doc) => {
       const message = doc.data();
       const messageElement = document.createElement('div');
       messageElement.textContent = `${message.user}: ${message.message}`;
-      chatMessagesContainer.appendChild(messageElement);
-    });
-  });
 
-  // Listen for user changes
-  const usersCollection = collection(db, 'users');
-  const usersQuery = query(usersCollection);
-  onSnapshot(usersQuery, (snapshot) => {
-    const users = snapshot.docs.map((doc) => doc.data().name);
-    const userList = document.createElement('div');
-    userList.textContent = `Users online: ${users.join(', ')}`;
-    chatMessagesContainer.appendChild(userList);
+      // Filter chat messages based on a condition
+      const shouldShowMessage = /* add your filtering condition here */;
+      if (shouldShowMessage) {
+        chatMessagesContainer.appendChild(messageElement);
+      }
+    });
   });
 
   // Send message

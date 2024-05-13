@@ -25,7 +25,8 @@
       <button id="send-button">Send</button>
       <button id="change-name-button">Change Name</button>
       <button id="sign-out-button">Sign Out</button>
-    </div>
+
+    </div>    
     <div class="profile-menu" style="display: none;">
       <input type="text" placeholder="Enter new name..." id="new-name-input">
       <button id="save-name-button">Save</button>
@@ -39,7 +40,6 @@ import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, si
     import { initializeChat } from './chat.js';
     import { doc, setDoc, updateDoc } from "https://www.gstatic.com/firebasejs/9.0.2/firebase-firestore.js";
     import { sendVerificationEmail } from './utils.js';
-
     // Get references to DOM elements
     const emailInput = document.getElementById('email-input');
     const passwordInput = document.getElementById('password-input');
@@ -60,7 +60,7 @@ import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, si
   if (specifiedUsername) {
     try {
       // Sign in anonymously
-      const userCredential = await auth.signInAnonymously();
+      const userCredential = await signInAnonymously(auth);
       const user = userCredential.user;
 
       // Create a new user document in Firestore
