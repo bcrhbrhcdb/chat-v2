@@ -1,3 +1,7 @@
+import { auth, db } from './firebase.js';
+import { initializeChat } from './chat.js';
+import { sendVerificationEmail } from './utils.js';
+
 // Get references to DOM elements
 const emailInput = document.getElementById('email-input');
 const passwordInput = document.getElementById('password-input');
@@ -10,6 +14,7 @@ const chatMessagesContainer = document.getElementById('chat-messages');
 const changeNameButton = document.getElementById('change-name-button');
 const newNameInput = document.getElementById('new-name-input');
 const saveNameButton = document.getElementById('save-name-button');
+const signOutButton = document.getElementById('sign-out-button');
 
 // Handle join button click
 joinButton.addEventListener('click', async () => {
