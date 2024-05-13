@@ -20,6 +20,9 @@ export function initializeChat(username, showChat = true) {
     document.querySelector('.chat-container').style.display = 'none';
   }
 
+  // Clear the chat container
+  chatMessagesContainer.innerHTML = '';
+
   // Listen for new messages and filter out profanity
   const unsubscribe = onSnapshot(messagesQuery, (snapshot) => {
     snapshot.docChanges().forEach((change) => {
@@ -71,29 +74,4 @@ export function initializeChat(username, showChat = true) {
       }
     }
   }
-}
-
-// Function to show the verification popup
-function showPopup() {
-  const popup = document.createElement('div');
-  popup.classList.add('popup');
-  popup.innerHTML = `
-    <div class="popup-content">
-      <span class="close-button">&times;</span>
-      <p>Please verify your email before joining the chat.</p>
-    </div>
-  `;
-
-  document.body.appendChild(popup);
-
-  const closeButton = popup.querySelector('.close-button');
-  closeButton.addEventListener('click', () => {
-    popup.remove();
-  });
-
-  window.addEventListener('click', (event) => {
-    if (event.target === popup) {
-      popup.remove();
-    }
-  });
 }
