@@ -46,13 +46,13 @@
     const signInButton = document.getElementById('sign-in-button');
     const signUpButton = document.getElementById('sign-up-button');
     const resetPasswordButton = document.getElementById('reset-password-button');
-    const nameInput = document.getElementById('name-input');
     const joinButton = document.getElementById('join-button');
     const chatMessagesContainer = document.getElementById('chat-messages');
     const changeNameButton = document.getElementById('change-name-button');
     const newNameInput = document.getElementById('new-name-input');
     const saveNameButton = document.getElementById('save-name-button');
     const signOutButton = document.getElementById('sign-out-button');
+    const sendButton = document.getElementById('send-button');
 
     // Handle join button click
     joinButton.addEventListener('click', async () => {
@@ -77,6 +77,23 @@
       } else {
         alert('Please enter a username to join the chat.');
         initializeChat(null, false); // Hide the chat container
+      }
+    });
+
+    // Handle send button click
+    sendButton.addEventListener('click', async () => {
+      const message = messageInput.value.trim();
+      if (message) {
+        try {
+          await addDoc(collection(db, 'messages'), {
+            user: auth.currentUser.displayName,
+            message,
+            created: new Date(),
+          });
+          messageInput.value = '';
+        } catch (error) {
+          console.error('Error sending message:', error);
+        }
       }
     });
 
