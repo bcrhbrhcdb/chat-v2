@@ -96,8 +96,8 @@ signInButton.addEventListener('click', () => {
       }
     })
     .catch((error) => {
-      console.error(error);
-      alert('Sign-in failed. Please check your credentials.');
+      console.error('Sign-in failed:', error.message);
+      alert(`Sign-in failed. ${error.message}`);
     });
 });
 
@@ -105,6 +105,21 @@ signInButton.addEventListener('click', () => {
 signUpButton.addEventListener('click', () => {
   const email = emailInput.value;
   const password = passwordInput.value;
+
+  // Check if the email is valid
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(email)) {
+    alert('Please enter a valid email address.');
+    return;
+  }
+
+  // Check if the password meets the minimum requirements
+  const passwordRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*()_+\-=\[\]{};:"\\|,.<>\/?]).{8,}$/;
+  if (!passwordRegex.test(password)) {
+    alert('Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, one digit, and one special character.');
+    return;
+  }
+
   createUserWithEmailAndPassword(auth, email, password)
     .then(async (userCredential) => {
       const user = userCredential.user;
@@ -124,8 +139,8 @@ signUpButton.addEventListener('click', () => {
       initializeChat(null, false); // Hide the chat container
     })
     .catch((error) => {
-      console.error(error);
-      alert('Sign-up failed. Please try again.');
+      console.error('Sign-up failed:', error.message);
+      alert(`Sign-up failed. ${error.message}`);
     });
 });
 
@@ -137,8 +152,8 @@ resetPasswordButton.addEventListener('click', () => {
       alert('Password reset email sent. Please check your inbox.');
     })
     .catch((error) => {
-      console.error(error);
-      alert('Failed to send password reset email.');
+      console.error('Error sending password reset email:', error.message);
+      alert(`Failed to send password reset email. ${error.message}`);
     });
 });
 
@@ -149,8 +164,8 @@ signOutButton.addEventListener('click', () => {
       hideChatInterface();
     })
     .catch((error) => {
-      console.error(error);
-      alert('Sign-out failed. Please try again.');
+      console.error('Sign-out failed:', error.message);
+      alert(`Sign-out failed. ${error.message}`);
     });
 });
 
@@ -196,8 +211,8 @@ async function updateName() {
       document.querySelector('.profile-menu').style.display = 'none';
       newNameInput.value = '';
     } catch (error) {
-      console.error('Error updating name:', error);
-      alert('Failed to update name. Please try again.');
+      console.error('Error updating name:', error.message);
+      alert(`Failed to update name. ${error.message}`);
     }
   } else {
     alert('Please enter a new name.');
@@ -248,16 +263,13 @@ signInAnonymouslyButton.addEventListener('click', () => {
         initializeChat('Anonymous', true);
       })
       .catch((error) => {
-        console.error(error);
-        alert('Sign-in failed. Please try again.');
+        console.error('Sign-in failed:', error.message);
+        alert(`Sign-in failed. ${error.message}`);
       });
   } else {
     alert('Please enter an email and password.');
   }
 });
-
-
-
   </script>
 </body>
 </html>
