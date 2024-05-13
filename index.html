@@ -55,6 +55,7 @@
       const saveNameButton = document.getElementById('save-name-button');
       const signOutButton = document.getElementById('sign-out-button');
       const sendButton = document.getElementById('send-button');
+      const messageInput = document.getElementById('message-input');
 
       // Handle join button click
       joinButton.addEventListener('click', async () => {
@@ -84,7 +85,6 @@
 
       // Handle send button click
       sendButton.addEventListener('click', async () => {
-        const messageInput = document.getElementById('message-input');
         const message = messageInput.value.trim();
         if (message) {
           try {
@@ -176,14 +176,18 @@
       // Reset password functionality
       resetPasswordButton.addEventListener('click', () => {
         const email = emailInput.value;
-        sendPasswordResetEmail(auth, email)
-          .then(() => {
-            alert('Password reset email sent. Please check your inbox.');
-          })
-          .catch((error) => {
-            console.error('Error sending password reset email:', error.message);
-            alert(`Failed to send password reset email. ${error.message}`);
-          });
+        if (email) {
+          sendPasswordResetEmail(auth, email)
+            .then(() => {
+              alert('Password reset email sent. Please check your inbox.');
+            })
+            .catch((error) => {
+              console.error('Error sending password reset email:', error.message);
+              alert(`Failed to send password reset email. ${error.message}`);
+            });
+        } else {
+          alert('Please enter your email address.');
+        }
       });
 
       // Sign-out functionality
