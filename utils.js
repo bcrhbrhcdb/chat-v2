@@ -1,4 +1,4 @@
-import { sendEmailVerification, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/9.0.2/firebase-auth.js";
+import { sendEmailVerification, sendPasswordResetEmail } from "firebase/auth";
 import { auth, firebaseConfig } from "./firebase.js";
 import { API_KEY } from './config.js';
 
