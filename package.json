@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.43.1",
+    "firebase": "^10.11.1",
     "firebase-tools": "^13.8.2",
     "next": "13.2.4",
     "react": "18.2.0",

@@ -30,7 +30,91 @@
       <button id="save-name-button">Save</button>
     </div>
   </div>
-  <script src="https://unpkg.com/bad-words/lib/badwords.json"></script>
-  <script src="script.js"></script>
+
+  <!-- Firebase SDK scripts -->
+  <script src="https://www.gstatic.com/firebasejs/9.0.2/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.0.2/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.0.2/firebase-analytics.js"></script>
+
+  <!-- Import the auth object from firebase.js -->
+  <script type="module">
+    import { auth } from './firebase.js';
+
+    // Get references to DOM elements
+    const emailInput = document.getElementById('email-input');
+    const passwordInput = document.getElementById('password-input');
+    const signInButton = document.getElementById('sign-in-button');
+    const signUpButton = document.getElementById('sign-up-button');
+    const nameInput = document.getElementById('name-input');
+    const joinButton = document.getElementById('join-button');
+    const messageInput = document.getElementById('message-input');
+    const sendButton = document.getElementById('send-button');
+    const changeNameButton = document.getElementById('change-name-button');
+    const signOutButton = document.getElementById('sign-out-button');
+    const newNameInput = document.getElementById('new-name-input');
+    const saveNameButton = document.getElementById('save-name-button');
+
+    // Sign-in functionality
+    signInButton.addEventListener('click', () => {
+      const email = emailInput.value;
+      const password = passwordInput.value;
+      signInWithEmailAndPassword(auth, email, password)
+        .then(() => {
+          showChatInterface();
+        })
+        .catch((error) => {
+          console.error(error);
+          alert('Sign-in failed. Please check your credentials.');
+        });
+    });
+
+    // Sign-up functionality
+    signUpButton.addEventListener('click', () => {
+      const email = emailInput.value;
+      const password = passwordInput.value;
+      createUserWithEmailAndPassword(auth, email, password)
+        .then(() => {
+          showChatInterface();
+        })
+        .catch((error) => {
+          console.error(error);
+          alert('Sign-up failed. Please try again.');
+        });
+    });
+
+    // Sign-out functionality
+    signOutButton.addEventListener('click', () => {
+      signOut(auth)
+        .then(() => {
+          hideChatInterface();
+        })
+        .catch((error) => {
+          console.error(error);
+          alert('Sign-out failed. Please try again.');
+        });
+    });
+
+    // Detect sign-in state
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        showChatInterface();
+      } else {
+        hideChatInterface();
+      }
+    });
+
+    // Show/hide chat interface
+    function showChatInterface() {
+      document.querySelector('.sign-in-container').style.display = 'none';
+      document.querySelector('.name-input').style.display = 'block';
+      document.querySelector('.chat-input').style.display = 'flex';
+    }
+
+    function hideChatInterface() {
+      document.querySelector('.sign-in-container').style.display = 'block';
+      document.querySelector('.name-input').style.display = 'none';
+      document.querySelector('.chat-input').style.display = 'none';
+    }
+  </script>
 </body>
 </html>
