@@ -8,7 +8,7 @@ export function initializeChat(username) {
   const messageInput = document.getElementById('message-input');
   const sendButton = document.getElementById('send-button');
 
-  // Listen for new messages and automatically filter
+  // Listen for new messages and filter out profanity
   const unsubscribe = onSnapshot(messagesQuery, (snapshot) => {
     chatMessagesContainer.innerHTML = '';
     snapshot.forEach((doc) => {
@@ -16,9 +16,11 @@ export function initializeChat(username) {
       const messageElement = document.createElement('div');
       messageElement.textContent = `${message.user}: ${message.message}`;
 
-      // Filter chat messages based on a condition
-      const shouldShowMessage = /* add your filtering condition here */;
-      if (shouldShowMessage) {
+      // Check if the message contains profanity
+      const containsProfanity = message.message.toLowerCase().includes('profanity');
+
+      // Only append the message element if it doesn't contain profanity
+      if (!containsProfanity) {
         chatMessagesContainer.appendChild(messageElement);
       }
     });
