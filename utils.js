@@ -1,6 +1,5 @@
 import { sendEmailVerification, sendPasswordResetEmail } from "firebase/auth";
-import { auth, firebaseConfig } from "./firebase.js";
-import { API_KEY } from './config.js';
+import { auth } from "./firebase.js";
 
 export const sendVerificationEmail = async (user) => {
   try {
@@ -13,28 +12,9 @@ export const sendVerificationEmail = async (user) => {
     const displayName = user.displayName || 'User';
     const appName = 'Noobs-inc';
 
-    const actionCode = await sendEmailVerification(user, actionCodeSettings);
+    await sendEmailVerification(user, actionCodeSettings);
 
-    const verificationLink = `https://chatroom-50dfb.firebaseapp.com/__/auth/action?mode=verifyEmail&oobCode=${actionCode}&apiKey=${API_KEY}`;
-
-    const emailTemplate = `From: Noobs-Inc@chatroom-50dfb.firebaseapp.com
-Reply to: noreply
-Subject: Verify your email for ${appName}
-Message:
-Hello ${displayName},
-
-Follow this link to verify your email address.
-
-${verificationLink}
-
-If you didn't ask to verify this address, you can ignore this email.
-
-Thanks,
-
-Your ${appName} team`;
-
-    // Send the email verification email using your preferred method (e.g., email service provider)
-    console.log(emailTemplate);
+    console.log(`Email verification sent to ${email}`);
   } catch (error) {
     console.error('Error sending email verification:', error);
   }
@@ -49,29 +29,9 @@ export const sendPasswordResetEmail = async (email) => {
 
     const appName = 'Noobs-inc';
 
-    const actionCode = await sendPasswordResetEmail(auth, email, actionCodeSettings);
+    await sendPasswordResetEmail(auth, email, actionCodeSettings);
 
-    const resetLink = `https://chatroom-50dfb.firebaseapp.com/__/auth/action?mode=resetPassword&oobCode=${actionCode}&apiKey=${API_KEY}`;
-
-    const emailTemplate = `Sender name: Noobs-Inc
-From: Noobs-inc@chatroom-50dfb.firebaseapp.com
-Reply to: noreply
-Subject: Reset your password for ${appName}
-Message:
-Hello,
-
-Follow this link to reset your ${appName} password for your ${email} account.
-
-${resetLink}
-
-If you didn't ask to reset your password, you can ignore this email.
-
-Thanks,
-
-Your ${appName} team`;
-
-    // Send the password reset email using your preferred method (e.g., email service provider)
-    console.log(emailTemplate);
+    console.log(`Password reset email sent to ${email}`);
   } catch (error) {
     console.error('Error sending password reset email:', error);
   }

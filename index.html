@@ -7,44 +7,35 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <header>
-    <h1>Chat App</h1>
-  </header>
-  <main>
-    <section class="sign-in-container">
-      <label for="email-input">Email</label>
-      <input type="email" id="email-input" placeholder="Enter your email">
-      <label for="password-input">Password</label>
-      <input type="password" id="password-input" placeholder="Enter your password">
+  <div class="chat-container">
+    <div class="sign-in-container">
+      <input type="email" placeholder="Email" id="email-input">
+      <input type="password" placeholder="Password" id="password-input">
       <button id="sign-in-button">Sign In</button>
       <button id="sign-up-button">Sign Up</button>
       <button id="reset-password-button">Reset Password</button>
-    </section>
-    <section class="name-input" style="display: none;">
-      <label for="name-input">Name</label>
-      <input type="text" id="name-input" placeholder="Enter your name...">
+    </div>
+    <div class="name-input" style="display: none;">
+      <input type="text" placeholder="Enter your name..." id="name-input">
       <button id="join-button">Join</button>
-    </section>
-    <section class="chat-messages" id="chat-messages"></section>
-    <section class="chat-input" style="display: none;">
-      <input type="text" id="message-input" placeholder="Type your message...">
+    </div>
+    <div class="chat-messages" id="chat-messages"></div>
+    <div class="chat-input" style="display: none;">
+      <input type="text" placeholder="Type your message..." id="message-input">
       <button id="send-button">Send</button>
       <button id="change-name-button">Change Name</button>
       <button id="sign-out-button">Sign Out</button>
-    </section>
-    <section class="profile-menu" style="display: none;">
-      <label for="new-name-input">New Name</label>
-      <input type="text" id="new-name-input" placeholder="Enter new name...">
+    </div>
+    <div class="profile-menu" style="display: none;">
+      <input type="text" placeholder="Enter new name..." id="new-name-input">
       <button id="save-name-button">Save</button>
-    </section>
-  </main>
-  <footer>
-    <!-- Footer content -->
-  </footer>
+    </div>
+  </div>
 
   <!-- Firebase SDK scripts -->
   <script src="https://www.gstatic.com/firebasejs/9.0.2/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.0.2/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.0.2/firebase-analytics.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.0.2/firebase-firestore.js"></script>
 
   <!-- Import JavaScript modules -->
