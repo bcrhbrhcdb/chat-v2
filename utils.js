@@ -9,10 +9,10 @@ export const sendVerificationEmail = async (user) => {
     };
 
     await sendEmailVerification(user, actionCodeSettings);
-
     console.log(`Email verification sent to ${user.email}`);
   } catch (error) {
-    console.error('Error sending email verification:', error);
+    console.error('Error sending email verification:', error.message);
+    throw error; // Re-throw the error to propagate it to the calling function
   }
 };
 
@@ -24,9 +24,9 @@ export const sendPasswordResetEmail = async (email) => {
     };
 
     await auth.sendPasswordResetEmail(email, actionCodeSettings);
-
     console.log(`Password reset email sent to ${email}`);
   } catch (error) {
-    console.error('Error sending password reset email:', error);
+    console.error('Error sending password reset email:', error.message);
+    throw error; // Re-throw the error to propagate it to the calling function
   }
-}
+};
