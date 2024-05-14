@@ -1,4 +1,3 @@
-<!-- main.js -->
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.0.2/firebase-app.js";
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/9.0.2/firebase-auth.js";
 import { getDatabase, ref, push, onChildAdded, onDisconnect, remove } from "https://www.gstatic.com/firebasejs/9.0.2/firebase-database.js";
