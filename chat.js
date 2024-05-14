@@ -1,5 +1,6 @@
 import { auth, db } from './main.js';
 import { doc, setDoc, updateDoc, collection, addDoc, query, orderBy, onSnapshot, getDocs, where, writeBatch } from "https://www.gstatic.com/firebasejs/9.0.2/firebase-firestore.js";
+import { sendVerificationEmail } from './utils.js';
 
 export function initializeChat(username, showChat = true) {
   const messagesCollection = collection(db, 'messages');
@@ -14,6 +15,7 @@ export function initializeChat(username, showChat = true) {
   const user = auth.currentUser;
   if (!user || !user.emailVerified) {
     showPopup('Please verify your email before joining the chat.');
+    sendVerificationEmail(user); // Send verification email
     return;
   }
 
