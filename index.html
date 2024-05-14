@@ -8,7 +8,28 @@
 </head>
 <body>
   <div class="chat-container">
-    <!-- ... (rest of the HTML code) -->
+    <div class="sign-in-container">
+      <input type="email" placeholder="Email" id="email-input">
+      <input type="password" placeholder="Password" id="password-input">
+      <button id="sign-in-button">Sign In</button>
+      <button id="sign-up-button">Sign Up</button>
+      <button id="reset-password-button">Reset Password</button>
+    </div>
+    <div class="name-input" style="display: none;">
+      <input type="text" placeholder="Enter your name..." id="name-input">
+      <button id="join-button">Join</button>
+    </div>
+    <div class="chat-messages" id="chat-messages"></div>
+    <div class="chat-input" style="display: none;">
+      <input type="text" placeholder="Type your message..." id="message-input">
+      <button id="send-button">Send</button>
+      <button id="change-name-button">Change Name</button>
+      <button id="sign-out-button">Sign Out</button>
+    </div>
+    <div class="profile-menu" style="display: none;">
+      <input type="text" placeholder="Enter new name..." id="new-name-input">
+      <button id="save-name-button">Save</button>
+    </div>
   </div>
 
   <!-- Firebase SDK scripts -->
@@ -19,6 +40,10 @@
 
   <!-- Initialize Firebase -->
   <script>
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.0.2/firebase-app.js";
+    import { getAuth } from "https://www.gstatic.com/firebasejs/9.0.2/firebase-auth.js";
+    import { getFirestore } from "https://www.gstatic.com/firebasejs/9.0.2/firebase-firestore.js";
+
     const firebaseConfig = {
       apiKey: "AIzaSyDisnhcjYmvZc2y9-toeWWKHq9nHYb8Fn4",
       authDomain: "chatroom-50dfb.firebaseapp.com",
@@ -29,20 +54,17 @@
       appId: "1:533310796123:web:1f9cb3326563d3dee72a7e",
       measurementId: "G-GTXX84ZBPD"
     };
-    firebase.initializeApp(firebaseConfig);
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    export { auth, db };
   </script>
 
   <!-- Import the auth object from firebase.js -->
-  <script type="module">
-    import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, sendPasswordResetEmail, updateProfile } from "https://www.gstatic.com/firebasejs/9.0.2/firebase-auth.js";
-    import { getFirestore, doc, setDoc, updateDoc, collection, addDoc, query, orderBy, onSnapshot, getDocs, where, writeBatch } from "https://www.gstatic.com/firebasejs/9.0.2/firebase-firestore.js";
-    import { initializeChat } from './chat.js';
-    import { sendVerificationEmail } from './utils.js';
-
-    const auth = getAuth();
-    const db = getFirestore();
-
-    // ... (rest of the JavaScript code)
+  <script type="module" src="main.js">
+  
   </script>
 </body>
 </html>
