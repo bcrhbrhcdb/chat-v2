@@ -1,4 +1,4 @@
-import { auth, db } from './firebase.js';
+import { auth, db } from './main.js';
 import { doc, setDoc, updateDoc, collection, addDoc, query, orderBy, onSnapshot, getDocs, where, writeBatch } from "https://www.gstatic.com/firebasejs/9.0.2/firebase-firestore.js";
 
 export function initializeChat(username, showChat = true) {
