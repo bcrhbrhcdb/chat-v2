@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Chat App</title>
-  <link rel="stylesheet" href="style.css"
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <div class="chat-container">
@@ -17,6 +17,7 @@
       <button id="reset-password-button">Reset Password</button>
     </div>
     <div class="name-input" style="display: none;">
+      <input type="text" placeholder="Enter your name..." id="name-input">
       <button id="join-button">Join Now!</button>
     </div>
     <div class="chat-messages" id="chat-messages"></div>
@@ -25,13 +26,20 @@
       <button id="send-button">Send</button>
       <button id="change-name-button">Change Name</button>
       <button id="sign-out-button">Sign Out</button>
-    </div>    
+    </div>
     <div class="profile-menu" style="display: none;">
       <input type="text" placeholder="Enter new name..." id="new-name-input">
       <button id="save-name-button">Save</button>
     </div>
   </div>
 
+  <!-- Firebase SDK scripts -->
+  <script src="https://www.gstatic.com/firebasejs/9.0.2/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.0.2/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.0.2/firebase-analytics.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.0.2/firebase-firestore.js"></script>
+
+  <!-- Import the auth object from firebase.js -->
   <script type="module" src="main.js"></script>
 </body>
 </html>
