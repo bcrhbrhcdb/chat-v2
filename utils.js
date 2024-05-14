@@ -1,4 +1,4 @@
-import { getAuth, sendEmailVerification } from "https://www.gstatic.com/firebasejs/9.0.2/firebase-auth.js";
+import { getAuth, sendEmailVerification, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/9.0.2/firebase-auth.js";
 import { auth } from "./main.js";
 
 export const sendVerificationEmail = async (user) => {
@@ -12,11 +12,11 @@ export const sendVerificationEmail = async (user) => {
     console.log(`Email verification sent to ${user.email}`);
   } catch (error) {
     console.error('Error sending email verification:', error.message);
-    throw error; // Re-throw the error to propagate it to the calling function
+    throw error;
   }
 };
 
-export const sendPasswordResetEmail = async (email) => {
+export const sendPasswordResetEmailUtil = async (email) => {
   try {
     const actionCodeSettings = {
       url: 'https://chatroom-50dfb.firebaseapp.com/__/auth/action',
@@ -27,6 +27,6 @@ export const sendPasswordResetEmail = async (email) => {
     console.log(`Password reset email sent to ${email}`);
   } catch (error) {
     console.error('Error sending password reset email:', error.message);
-    throw error; // Re-throw the error to propagate it to the calling function
+    throw error;
   }
 };
