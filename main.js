@@ -3,7 +3,7 @@ import { auth, db } from './firebase.js';
 import { initializeChat } from './chat.js';
 import { doc, setDoc, updateDoc, collection, addDoc, query, orderBy, onSnapshot, getDocs, where, writeBatch } from "https://www.gstatic.com/firebasejs/9.0.2/firebase-firestore.js";
 import { sendVerificationEmail } from './utils.js';
-
+document.addEventListener('DOMContentLoaded', () => {
 const emailInput = document.getElementById('email-input');
 const passwordInput = document.getElementById('password-input');
 const signInButton = document.getElementById('sign-in-button');
@@ -250,3 +250,4 @@ signInAnonymouslyButton.addEventListener('click', () => {
     showPopup('Please enter an email and password.');
   }
 });
+ });
