@@ -1,6 +1,8 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.0.2/firebase-app.js";
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/9.0.2/firebase-auth.js";
-import { getDatabase, ref, push, onChildAdded, onDisconnect, remove } from "https://www.gstatic.com/firebasejs/9.0.2/firebase-database.js";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/9.0.2/firebase-auth.js";
+import { getFirestore } from "https://www.gstatic.com/firebasejs/9.0.2/firebase-firestore.js";
+import { sendPasswordResetEmailUtil } from './utils.js';
+import { initializeChat } from './chat.js';
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
@@ -15,8 +17,8 @@ const firebaseConfig = {
 };
 
 const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const database = getDatabase(app);
+export const auth = getAuth(app);
+export const db = getFirestore(app);
 
 // DOM elements
 const signInContainer = document.querySelector('.sign-in-container');
@@ -38,15 +40,11 @@ document.querySelector('#reset-password-button').addEventListener('click', reset
 
 // Chat event listeners
 joinButton.addEventListener('click', joinChat);
-sendButton.addEventListener('click', sendMessage);
-changeNameButton.addEventListener('click', showProfileMenu);
-signOutButton.addEventListener('click', signOutUser);
 saveNameButton.addEventListener('click', saveNewName);
 
 // Firebase references
 let currentUser;
 let currentUserName;
-let currentUserRef;
 
 // Sign in function
 function signIn() {
@@ -82,7 +80,7 @@ function signUp() {
 function resetPassword() {
   const email = document.querySelector('#email-input').value;
 
-  sendPasswordResetEmail(auth, email)
+  sendPasswordResetEmailUtil(email)
     .then(() => {
       alert('Password reset email sent!');
     })
@@ -102,70 +100,23 @@ function joinChat() {
   currentUserName = nameInput.value.trim();
   if (currentUserName) {
     document.querySelector('.name-input').style.display = 'none';
-    document.querySelector('.chat-input').style.display = 'flex';
-    currentUserRef = push(ref(database, 'users'), {
-      name: currentUserName,
-      userId: currentUser.uid
-    });
-
-    onDisconnect(currentUserRef).remove();
-
-    listenForMessages();
+    initializeChat(currentUserName);
   }
-}
-
-// Listen for new messages
-function listenForMessages() {
-  const messagesRef = ref(database, 'messages');
-  onChildAdded(messagesRef, (data) => {
-    const message = data.val();
-    const messageElement = document.createElement('div');
-    messageElement.textContent = `${message.name}: ${message.text}`;
-    chatMessages.appendChild(messageElement);
-  });
-}
-
-// Send message
-function sendMessage() {
-  const messageText = messageInput.value.trim();
-  if (messageText) {
-    const messagesRef = ref(database, 'messages');
-    push(messagesRef, {
-      name: currentUserName,
-      text: messageText
-    });
-    messageInput.value = '';
-  }
-}
-
-// Show profile menu
-function showProfileMenu() {
-  profileMenu.style.display = 'block';
-}
-
-// Sign out user
-function signOutUser() {
-  signOut(auth)
-    .then(() => {
-      currentUser = null;
-      currentUserName = null;
-      currentUserRef = null;
-      chatMessages.innerHTML = '';
-      signInContainer.style.display = 'block';
-      document.querySelector('.chat-input').style.display = 'none';
-      profileMenu.style.display = 'none';
-    })
-    .catch((error) => {
-      console.error(error);
-    });
 }
 
 // Save new name
 function saveNewName() {
   const newName = newNameInput.value.trim();
   if (newName) {
-    currentUserRef.update({ name: newName });
-    currentUserName = newName;
-    profileMenu.style.display = 'none';
+    currentUser.updateProfile({
+      displayName: newName
+    })
+    .then(() => {
+      currentUserName = newName;
+      profileMenu.style.display = 'none';
+    })
+    .catch((error) => {
+      console.error('Error updating display name:', error);
+    });
   }
 }
