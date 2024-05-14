@@ -2,9 +2,8 @@ import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, si
 import { auth, db } from './firebase.js';
 import { initializeChat } from './chat.js';
 import { doc, setDoc, updateDoc, collection, addDoc, query, orderBy, onSnapshot, getDocs, where, writeBatch } from "https://www.gstatic.com/firebasejs/9.0.2/firebase-firestore.js";
-import { sendVerificationEmail, sendPasswordResetEmail } from './utils.js';
+import { sendVerificationEmail } from './utils.js';
 
-// Get references to DOM elements
 const emailInput = document.getElementById('email-input');
 const passwordInput = document.getElementById('password-input');
 const signInButton = document.getElementById('sign-in-button');
@@ -20,7 +19,6 @@ const signOutButton = document.getElementById('sign-out-button');
 const sendButton = document.getElementById('send-button');
 const messageInput = document.getElementById('message-input');
 
-// Function to show popup
 function showPopup(message) {
   const popup = document.createElement('div');
   popup.classList.add('popup');
@@ -30,7 +28,6 @@ function showPopup(message) {
       <p>${message}</p>
     </div>
   `;
-
   document.body.appendChild(popup);
 
   const closeButton = popup.querySelector('.close-button');
@@ -45,34 +42,28 @@ function showPopup(message) {
   });
 }
 
-// Handle join button click
 joinButton.addEventListener('click', async () => {
   const specifiedUsername = nameInput.value.trim();
   if (specifiedUsername) {
     try {
-      // Sign in anonymously
       const userCredential = await signInAnonymously(auth);
       const user = userCredential.user;
-
-      // Create a new user document in Firestore
       await setDoc(doc(db, "users", user.uid), {
         name: specifiedUsername,
         email: user.email || null,
       });
-
-      // Initialize chat functionality
       initializeChat(specifiedUsername, true);
+      showChatInterface();
     } catch (error) {
       console.error('Error signing in:', error);
       showPopup('Failed to sign in. Please try again.');
     }
   } else {
     showPopup('Please enter a username to join the chat.');
-    initializeChat(null, false); // Hide the chat container
+    initializeChat(null, false);
   }
 });
 
-// Handle send button click
 sendButton.addEventListener('click', async () => {
   const message = messageInput.value.trim();
   if (message) {
@@ -90,7 +81,6 @@ sendButton.addEventListener('click', async () => {
   }
 });
 
-// Sign-in functionality
 signInButton.addEventListener('click', () => {
   const email = emailInput.value;
   const password = passwordInput.value;
@@ -99,6 +89,7 @@ signInButton.addEventListener('click', () => {
       const user = userCredential.user;
       if (user.emailVerified) {
         initializeChat(user.displayName || 'Anonymous', true);
+        showChatInterface();
       } else {
         showPopup('Please verify your email before joining the chat.');
         initializeChat(null, false);
@@ -110,7 +101,6 @@ signInButton.addEventListener('click', () => {
     });
 });
 
-// Sign-up functionality
 signUpButton.addEventListener('click', () => {
   const email = emailInput.value;
   const password = passwordInput.value;
@@ -151,7 +141,6 @@ signUpButton.addEventListener('click', () => {
     });
 });
 
-// Reset password functionality
 resetPasswordButton.addEventListener('click', () => {
   const email = emailInput.value;
   if (email) {
@@ -168,7 +157,6 @@ resetPasswordButton.addEventListener('click', () => {
   }
 });
 
-// Sign-out functionality
 signOutButton.addEventListener('click', () => {
   signOut(auth)
     .then(() => {
@@ -180,7 +168,6 @@ signOutButton.addEventListener('click', () => {
     });
 });
 
-// Change name functionality
 changeNameButton.addEventListener('click', () => {
   document.querySelector('.profile-menu').style.display = 'block';
 });
@@ -220,7 +207,6 @@ async function updateName() {
   }
 }
 
-// Detect sign-in state
 onAuthStateChanged(auth, (user) => {
   if (user && user.emailVerified) {
     initializeChat(user.displayName || 'Anonymous', true);
@@ -229,7 +215,6 @@ onAuthStateChanged(auth, (user) => {
   }
 });
 
-// Show/hide chat interface
 function showChatInterface() {
   document.querySelector('.sign-in-container').style.display = 'none';
   document.querySelector('.name-input').style.display = 'block';
