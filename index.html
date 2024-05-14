@@ -7,64 +7,56 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div class="chat-container">
-    <div class="sign-in-container">
-      <h1>CHATROOM IS NOT WORKING, I AM FIXING IT.</h1>
-      <input type="email" placeholder="Email" id="email-input">
-      <input type="password" placeholder="Password" id="password-input">
-      <button id="sign-in-button">Sign In</button>
-      <button id="sign-up-button">Sign Up</button>
-      <button id="reset-password-button">Reset Password</button>
-    </div>
-    <div class="name-input" style="display: none;">
-      <input type="text" placeholder="Enter your name..." id="name-input">
-      <button id="join-button">Join</button>
-    </div>
-    <div class="chat-messages" id="chat-messages"></div>
-    <div class="chat-input" style="display: none;">
-      <input type="text" placeholder="Type your message..." id="message-input">
-      <button id="send-button">Send</button>
-      <button id="change-name-button">Change Name</button>
-      <button id="sign-out-button">Sign Out</button>
-    </div>
-    <div class="profile-menu" style="display: none;">
-      <input type="text" placeholder="Enter new name..." id="new-name-input">
-      <button id="save-name-button">Save</button>
-    </div>
+<div class="chat-container">
+  <div class="sign-in-container">
+    <h1>CHATROOM IS NOT WORKING, I AM FIXING IT.</h1>
+    <input type="email" placeholder="Email" id="email-input">
+    <input type="password" placeholder="Password" id="password-input">
+    <button id="sign-in-button">Sign In</button>
+    <button id="sign-up-button">Sign Up</button>
+    <button id="reset-password-button">Reset Password</button>
   </div>
 
+  <div class="name-input" style="display: none;">
+    <input type="text" placeholder="Enter your name..." id="name-input">
+    <button id="join-button">Join</button>
+  </div>
+
+  <div class="chat-messages" id="chat-messages"></div>
+
+  <div class="chat-input" style="display: none;">
+    <input type="text" placeholder="Type your message..." id="message-input">
+    <button id="send-button">Send</button>
+    <button id="change-name-button">Change Name</button>
+    <button id="sign-out-button">Sign Out</button>
+  </div>
+
+  <div class="profile-menu" style="display: none;">
+    <input type="text" placeholder="Enter new name..." id="new-name-input">
+    <button id="save-name-button">Save</button>
+  </div>
+</div>
+
+
   <!-- Firebase SDK scripts -->
-  <script src="https://www.gstatic.com/firebasejs/9.0.2/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.0.2/firebase-auth.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.0.2/firebase-analytics.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.0.2/firebase-firestore.js"></script>
+  <!-- Firebase SDK scripts -->
+<script src="https://www.gstatic.com/firebasejs/9.0.2/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.0.2/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.0.2/firebase-analytics.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.0.2/firebase-firestore.js"></script>
 
-  <!-- Initialize Firebase -->
-  <script>
-    const firebaseConfig = {
-      apiKey: "AIzaSyDisnhcjYmvZc2y9-toeWWKHq9nHYb8Fn4",
-      authDomain: "chatroom-50dfb.firebaseapp.com",
-      databaseURL: "https://chatroom-50dfb-default-rtdb.firebaseio.com",
-      projectId: "chatroom-50dfb",
-      storageBucket: "chatroom-50dfb.appspot.com",
-      messagingSenderId: "533310796123",
-      appId: "1:533310796123:web:1f9cb3326563d3dee72a7e",
-      measurementId: "G-GTXX84ZBPD"
-    };
-    firebase.initializeApp(firebaseConfig);
-  </script>
+<!-- Initialize Firebase -->
+<script>
+  const firebaseConfig = {
+    // Your Firebase configuration goes here
+  };
+  firebase.initializeApp(firebaseConfig);
+</script>
 
-  <!-- Import the auth object from firebase.js -->
-  <script type="module">
-    import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, sendPasswordResetEmail, updateProfile } from "https://www.gstatic.com/firebasejs/9.0.2/firebase-auth.js";
-    import { getFirestore, doc, setDoc, updateDoc, collection, addDoc, query, orderBy, onSnapshot, getDocs, where, writeBatch } from "https://www.gstatic.com/firebasejs/9.0.2/firebase-firestore.js";
-    import { initializeChat } from './chat.js';
-    import { sendVerificationEmail } from './utils.js';
+<!-- Import Firebase modules and initialize instances -->
+<script type="module">
+ 
+</script>
 
-    const auth = getAuth();
-    const db = getFirestore();
-  </script>
-
-  <script type="module" src="main.js"></script>
 </body>
 </html>
