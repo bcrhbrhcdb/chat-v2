@@ -20,22 +20,14 @@ const signOutButton = document.getElementById('sign-out-button');
 const sendButton = document.getElementById('send-button');
 const messageInput = document.getElementById('message-input');
 
-// Override console.error to show errors as popups
-const originalConsoleError = console.error;
-console.error = function () {
-  const errorMessage = Array.prototype.slice.call(arguments).join(' ');
-  showErrorPopup(errorMessage);
-  originalConsoleError.apply(console, arguments);
-};
-
-// Function to show error popup
-function showErrorPopup(errorMessage) {
+// Function to show popup
+function showPopup(message) {
   const popup = document.createElement('div');
   popup.classList.add('popup');
   popup.innerHTML = `
     <div class="popup-content">
       <span class="close-button">&times;</span>
-      <p>${errorMessage}</p>
+      <p>${message}</p>
     </div>
   `;
 
@@ -72,9 +64,10 @@ joinButton.addEventListener('click', async () => {
       initializeChat(specifiedUsername, true);
     } catch (error) {
       console.error('Error signing in:', error);
+      showPopup('Failed to sign in. Please try again.');
     }
   } else {
-    alert('Please enter a username to join the chat.');
+    showPopup('Please enter a username to join the chat.');
     initializeChat(null, false); // Hide the chat container
   }
 });
@@ -92,6 +85,7 @@ sendButton.addEventListener('click', async () => {
       messageInput.value = '';
     } catch (error) {
       console.error('Error sending message:', error);
+      showPopup('Failed to send message. Please try again.');
     }
   }
 });
@@ -106,13 +100,13 @@ signInButton.addEventListener('click', () => {
       if (user.emailVerified) {
         initializeChat(user.displayName || 'Anonymous', true);
       } else {
-        alert('Please verify your email before joining the chat.');
+        showPopup('Please verify your email before joining the chat.');
         initializeChat(null, false);
       }
     })
     .catch((error) => {
       console.error('Sign-in failed:', error.message);
-      alert(`Sign-in failed. ${error.message}`);
+      showPopup(`Sign-in failed. ${error.message}`);
     });
 });
 
@@ -122,12 +116,12 @@ signUpButton.addEventListener('click', () => {
   const password = passwordInput.value;
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   if (!emailRegex.test(email)) {
-    alert('Please enter a valid email address.');
+    showPopup('Please enter a valid email address.');
     return;
   }
   const passwordRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*()_+\-=\[\]{};:"\\|,.<>\/?]).{8,}$/;
   if (!passwordRegex.test(password)) {
-    alert('Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, one digit, and one special character.');
+    showPopup('Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, one digit, and one special character.');
     return;
   }
   createUserWithEmailAndPassword(auth, email, password)
@@ -144,16 +138,16 @@ signUpButton.addEventListener('click', () => {
       try {
         await sendVerificationEmail(user);
         console.log('Email verification sent');
-        alert('Please verify your email before continuing.');
+        showPopup('Please verify your email before continuing.');
         initializeChat(null, false);
       } catch (error) {
         console.error('Error sending email verification:', error.message);
-        alert(`Sign-up failed. ${error.message}`);
+        showPopup(`Sign-up failed. ${error.message}`);
       }
     })
     .catch((error) => {
       console.error('Sign-up failed:', error.message);
-      alert(`Sign-up failed. ${error.message}`);
+      showPopup(`Sign-up failed. ${error.message}`);
     });
 });
 
@@ -163,14 +157,14 @@ resetPasswordButton.addEventListener('click', () => {
   if (email) {
     sendPasswordResetEmail(email)
       .then(() => {
-        alert('Password reset email sent. Please check your inbox.');
+        showPopup('Password reset email sent. Please check your inbox.');
       })
       .catch((error) => {
         console.error('Error sending password reset email:', error.message);
-        alert(`Failed to send password reset email. ${error.message}`);
+        showPopup(`Failed to send password reset email. ${error.message}`);
       });
   } else {
-    alert('Please enter your email address.');
+    showPopup('Please enter your email address.');
   }
 });
 
@@ -182,7 +176,7 @@ signOutButton.addEventListener('click', () => {
     })
     .catch((error) => {
       console.error('Sign-out failed:', error.message);
-      alert(`Sign-out failed. ${error.message}`);
+      showPopup(`Sign-out failed. ${error.message}`);
     });
 });
 
@@ -214,15 +208,15 @@ async function updateName() {
       });
       await batch.commit();
       initializeChat(newName, true);
-      alert('Name updated successfully');
+      showPopup('Name updated successfully');
       document.querySelector('.profile-menu').style.display = 'none';
       newNameInput.value = '';
     } catch (error) {
       console.error('Error updating name:', error.message);
-      alert(`Failed to update name. ${error.message}`);
+      showPopup(`Failed to update name. ${error.message}`);
     }
   } else {
-    alert('Please enter a new name.');
+    showPopup('Please enter a new name.');
   }
 }
 
@@ -265,9 +259,9 @@ signInAnonymouslyButton.addEventListener('click', () => {
       })
       .catch((error) => {
         console.error('Sign-in failed:', error.message);
-        alert(`Sign-in failed. ${error.message}`);
+        showPopup(`Sign-in failed. ${error.message}`);
       });
   } else {
-    alert('Please enter an email and password.');
+    showPopup('Please enter an email and password.');
   }
 });
