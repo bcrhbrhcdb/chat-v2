@@ -6,6 +6,9 @@ export function initializeChat(username, showChat = true) {
   const messagesQuery = query(messagesCollection, orderBy('created', 'asc'));
   const chatMessagesContainer = document.getElementById('chat-messages');
   const messageInput = document.getElementById('message-input');
+  const sendButton = document.getElementById('send-button');
+  const changeNameButton = document.getElementById('change-name-button');
+  const signOutButton = document.getElementById('sign-out-button');
 
   // Check if the user is verified
   const user = auth.currentUser;
@@ -18,8 +21,10 @@ export function initializeChat(username, showChat = true) {
   // Show or hide the chat interface
   if (showChat) {
     document.querySelector('.chat-container').style.display = 'block';
+    document.querySelector('.chat-input').style.display = 'flex';
   } else {
     document.querySelector('.chat-container').style.display = 'none';
+    document.querySelector('.chat-input').style.display = 'none';
   }
 
   // Clear the chat container
@@ -77,4 +82,43 @@ export function initializeChat(username, showChat = true) {
       }
     });
   }
+
+  // Handle send button click
+  sendButton.addEventListener('click', async () => {
+    const message = messageInput.value.trim();
+    if (message) {
+      try {
+        await addDoc(collection(db, 'messages'), {
+          user: auth.currentUser.displayName,
+          message,
+          created: new Date(),
+        });
+        messageInput.value = '';
+      } catch (error) {
+        console.error('Error sending message:', error);
+      }
+    }
+  });
+
+  // Handle change name button click
+  changeNameButton.addEventListener('click', () => {
+    document.querySelector('.profile-menu').style.display = 'block';
+  });
+
+  // Handle sign-out button click
+  signOutButton.addEventListener('click', () => {
+    signOut(auth)
+      .then(() => {
+        hideChatInterface();
+      })
+      .catch((error) => {
+        console.error('Sign-out failed:', error.message);
+        alert(`Sign-out failed. ${error.message}`);
+      });
+  });
+}
+
+function hideChatInterface() {
+  document.querySelector('.chat-container').style.display = 'none';
+  document.querySelector('.chat-input').style.display = 'none';
 }
