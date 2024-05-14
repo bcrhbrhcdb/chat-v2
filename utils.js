@@ -23,7 +23,7 @@ export const sendPasswordResetEmail = async (email) => {
       handleCodeInApp: true,
     };
 
-    await auth.sendPasswordResetEmail(email, actionCodeSettings);
+    await sendPasswordResetEmail(auth, email, actionCodeSettings);
     console.log(`Password reset email sent to ${email}`);
   } catch (error) {
     console.error('Error sending password reset email:', error.message);
