@@ -1,9 +1,7 @@
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, updateProfile, signInAnonymously } from "https://www.gstatic.com/firebasejs/9.0.2/firebase-auth.js";
-import { auth, db } from './firebase.js';
-import { initializeChat } from './chat.js';
 import { doc, setDoc, updateDoc, collection, addDoc, query, orderBy, onSnapshot, getDocs, where, writeBatch } from "https://www.gstatic.com/firebasejs/9.0.2/firebase-firestore.js";
 import { sendVerificationEmail } from './utils.js';
-document.addEventListener('DOMContentLoaded', () => {
+
 const emailInput = document.getElementById('email-input');
 const passwordInput = document.getElementById('password-input');
 const signInButton = document.getElementById('sign-in-button');
@@ -64,7 +62,15 @@ joinButton.addEventListener('click', async () => {
   }
 });
 
-sendButton.addEventListener('click', async () => {
+messageInput.addEventListener('keydown', handleMessageInputKeyDown);
+
+function handleMessageInputKeyDown(event) {
+  if (event.key === 'Enter') {
+    sendMessage();
+  }
+}
+
+async function sendMessage() {
   const message = messageInput.value.trim();
   if (message) {
     try {
@@ -79,7 +85,9 @@ sendButton.addEventListener('click', async () => {
       showPopup('Failed to send message. Please try again.');
     }
   }
-});
+}
+
+sendButton.addEventListener('click', sendMessage);
 
 signInButton.addEventListener('click', () => {
   const email = emailInput.value;
@@ -250,4 +258,3 @@ signInAnonymouslyButton.addEventListener('click', () => {
     showPopup('Please enter an email and password.');
   }
 });
- });
