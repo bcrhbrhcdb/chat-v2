@@ -4,6 +4,7 @@ import { initializeChat } from './chat.js';
 import { doc, setDoc, updateDoc, collection, addDoc, query, orderBy, onSnapshot, getDocs, where, writeBatch } from "https://www.gstatic.com/firebasejs/9.0.2/firebase-firestore.js";
 import { sendVerificationEmail } from './utils.js';
 
+
 // Ensure DOM is fully loaded before attaching event listeners
 document.addEventListener('DOMContentLoaded', () => {
   // Get references to DOM elements
